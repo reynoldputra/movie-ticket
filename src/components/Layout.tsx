@@ -7,10 +7,10 @@ type PropsType = {
 
 export default function Layout({ children }: PropsType) {
   return (
-    <div className="bg-slate-900 min-h-screen relative">
+    <main className="bg-slate-900 min-h-screen text-white">
       <Navbar />
       {children}
-    </div>
+    </main>
   )
 
 }

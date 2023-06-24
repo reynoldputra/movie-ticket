@@ -1,5 +1,9 @@
+import { useState } from "react"
+import Image from "next/image"
+import { cursorTo } from "readline"
 
 export default function Hero() {
+  const [currentMovie, setcurrentMovie] = useState(0)
   const movies = [
     {
       "id": 0,
@@ -29,9 +33,19 @@ export default function Hero() {
       "ticket_price": 49000
     }
   ]
-  return (
-    <div>
 
-    </div>
+  return (
+    <section className="w-full min-h-screen flex justify-center items-center relative">
+      <div className="w-[600px] text-center relative z-10">
+        <p className="text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat obcaecati cum sapiente, quo quae exercitationem iure sunt eaque, commodi nemo, at debitis inventore amet veniam nesciunt! Atque ducimus reprehenderit autem</p>
+        <p className="text-lg font-bold mt-4">Title</p>
+      </div>
+      <div className="h-screen w-screen absolute z-0 brightness-50 opacity-20">
+        <Image src={movies[currentMovie].poster_url} fill className="object-cover" alt="movie poster" />
+      </div>
+      <div className="">
+
+      </div>
+    </section>
   )
 }

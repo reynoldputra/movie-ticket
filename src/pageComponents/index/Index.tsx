@@ -1,8 +1,10 @@
+import Hero from "./hero/Hero";
+
 export default function Index() {
 
   return (
-    <div>
-
-    </div>
+    <>
+      <Hero />
+    </>
   )
 }
