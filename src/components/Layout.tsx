@@ -7,7 +7,7 @@ type PropsType = {
 
 export default function Layout({ children }: PropsType) {
   return (
-    <main className="bg-slate-900 min-h-screen text-white">
+    <main className="bg-slate-900 overflow-x-hidden text-white relative">
       <Navbar />
       {children}
     </main>
