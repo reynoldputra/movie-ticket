@@ -90,33 +90,36 @@ export default function MovieList() {
   return (
     <section>
       <Grid>
-        <Cell cols="1_full">
+        <Cell cols="2_10">
           <p className="mt-20 font-bold text-lg">Discover Movies</p>
         </Cell>
-        <Cell cols="1_full">
+        <Cell cols="2_10">
           <div className="w-full flex justify-center">
             <div className="w-72 h-8 bg-slate-800 rounded-full"></div>
           </div>
         </Cell>
-        <Cell cols="1_full" className="w-full flex flex-wrap justify-between gap-x-4 gap-y-12 mt-12">
-          {
-            movies.map((movie, idx) => {
-              const date = new Date(movie.release_date)
-              const ageNumber = Number(movie.age_rating)
+        <Cell cols="2_10" className="mt-12">
+          <div className="w-full grid grid-cols-4 gap-x-8 gap-y-32">
+            {
+              movies.map((movie, idx) => {
+                const date = new Date(movie.release_date)
+                const ageNumber = Number(movie.age_rating)
 
-              return (
-                <MovieCard
-                  id={movie.id}
-                  title={movie.title}
-                  release_date={date}
-                  poster={movie.poster_url}
-                  age={ageNumber}
-                  price={movie.ticket_price}
-                  key={idx}
-                />
-              )
-            })
-          }
+                return (
+                  <div className="w-full flex justify-center" key={idx}>
+                    <MovieCard
+                      id={movie.id}
+                      title={movie.title}
+                      release_date={date}
+                      poster={movie.poster_url}
+                      age={ageNumber}
+                      price={movie.ticket_price}
+                    />
+                  </div>
+                )
+              })
+            }
+          </div>
         </Cell>
       </Grid>
     </section>

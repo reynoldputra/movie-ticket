@@ -24,7 +24,7 @@ export default function Navbar() {
 
   return (
     <div className="h-24 bg-gradient-to-b from-black/30 fixed w-full flex justify-between items-center z-50">
-      <p className="w-64 text-white text-center font-bold">App name</p>
+      <p className="w-64 text-cyan-300 text-center font-bold">App name</p>
       <div className="flex gap-14">
         {
           navbarItems.map((item: NavbarItemType, idx: number) => {
