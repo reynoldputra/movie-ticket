@@ -22,7 +22,7 @@ const MovieCard: FunctionComponent<MovieCardProps> = (props) => {
           <p className="font-bold text-cyan-300">{props.age.toString()}+</p>
         </div>
         <div className="w-full flex gap-2 text-slate-400 text-xs mt-3">
-          <p>{props.release_date.toLocaleDateString()}</p>
+          <p>{props.release_date.getFullYear()}</p>
           <p>|</p>
           <p>Rp {props.price.toString()}</p>
         </div>

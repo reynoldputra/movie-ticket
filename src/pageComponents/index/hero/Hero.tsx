@@ -48,17 +48,18 @@ export default function Hero() {
       <div className="h-screen w-screen absolute z-0 brightness-50 opacity-20">
         <Image src={movies[currentMovie].poster_url} fill className="object-cover" alt="movie poster" />
       </div>
-      <div className="absolute bottom-6 flex h-40 translate-x-1/3">
-        {
-          movies.map((movie, idx: number) => {
-            return (
-              <div className="w-36 h-40 relative" key={idx}>
-                <Image src={movie.poster_url} fill className="object-contain" alt="movie poster" />
-              </div>
-            )
-          })
-        }
-      </div>
+      {/* <div className="absolute bottom-6 flex h-40 translate-x-1/3"> */}
+      {/*   { */}
+      {/*     movies.map((movie, idx: number) => { */}
+      {/*       return ( */}
+      {/*         <div className="w-36 h-40 relative" key={idx}> */}
+      {/*           <Image src={movie.poster_url} fill className="object-contain" alt="movie poster" /> */}
+      {/*         </div> */}
+      {/*       ) */}
+      {/*     }) */}
+      {/*   } */}
+      {/* </div> */}
+      <div className="w-full h-32 bg-gradient-to-t from-slate-900 absolute bottom-0"></div>
     </section>
   )
 }
