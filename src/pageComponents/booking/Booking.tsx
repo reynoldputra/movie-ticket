@@ -1,4 +1,4 @@
-import BookingForm from "./movieDetail/BookingForm";
+import BookingForm from "./bookingForm/BookingForm";
 import MovieDetail from "./movieDetail/MovieDetail";
 
 export default function Booking() {
