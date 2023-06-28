@@ -1,9 +1,12 @@
 import Grid from "@/components/layout/grid";
 import Cell from "@/components/layout/cell";
-import DateInput from "./DateInput";
 import { Item } from "@/interfaces/DropdownItems"
 import DropdownInput from "@/components/form/DropdownInput";
+import Modal from "@/components/Modal";
+import { DayPicker } from "react-day-picker";
 
+import 'react-day-picker/dist/style.css';
+import SeatPicker from "./SeatPicker";
 export default function BookingForm() {
   const teaters: Item[] = [
     { id: 1, tag: 'Pakuwon City Mall' },
@@ -32,11 +35,17 @@ export default function BookingForm() {
         </div>
         <div className="mt-8">
           <label className="font-bold">Date</label>
-          <DateInput />
+          <Modal title="Select a Date">
+            <DayPicker mode="single" />
+          </Modal>
         </div>
         <div className="mt-8">
           <label className="font-bold">Time</label>
           <DropdownInput items={times} />
+        </div>
+        <div className="mt-8">
+          <label className="font-bold">Seat</label>
+          <SeatPicker />
         </div>
       </Cell>
     </Grid>

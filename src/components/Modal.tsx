@@ -1,9 +1,12 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
-import { DayPicker } from "react-day-picker"
-import 'react-day-picker/dist/style.css'
+import { Fragment, ReactNode, useState } from 'react'
 
-export default function DateInput() {
+interface ModalProps {
+  children: ReactNode
+  title: string
+}
+
+export default function Modal({ children, title }: ModalProps) {
   let [isOpen, setIsOpen] = useState(false)
 
   function closeModal() {
@@ -51,19 +54,17 @@ export default function DateInput() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
                     className="text-lg font-bold text-center leading-6 text-gray-900"
                   >
-                    Select a date
+                    {title}
                   </Dialog.Title>
                   <div className="mt-2 flex justify-center">
-                    <DayPicker 
-                      mode='single'
-                    />
+                    {children}
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-4 flex justify-center">
                     <button
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
@@ -81,4 +82,5 @@ export default function DateInput() {
     </>
   )
 }
+
 
