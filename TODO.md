@@ -9,11 +9,11 @@
 - [ ] Authorization
 
 ### Movie
-- [x] View all movies
-- [x] Movie detail
+- :white_check_mark: View all movies
+- :white_check_mark: Movie detail
 
 ### Ticket
-- [x] Booking ticket form
+- :white_check_mark: Booking ticket form
 - [ ] Ticket history (active ticket, and waiting payment)
 
 ### Balance
