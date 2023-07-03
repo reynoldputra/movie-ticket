@@ -89,9 +89,9 @@ export default function MovieList() {
 
   return (
     <section>
-      <Grid>
+      <Grid className="py-20">
         <Cell cols="2_10">
-          <p className="mt-20 font-bold text-lg">Discover Movies</p>
+          <p className="font-bold text-lg">Discover Movies</p>
         </Cell>
         <Cell cols="2_10">
           <div className="w-full flex justify-center">

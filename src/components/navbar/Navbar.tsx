@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { CgProfile } from "react-icons/cg"
+import ProfileNavbar from "./Profile"
 
 interface NavbarItemType {
   tag: string
@@ -38,12 +39,7 @@ export default function Navbar() {
           })
         }
       </div>
-      <div className="w-64 h-full flex items-center justify-center text-white gap-6">
-        <p className="font-bold">Username</p>
-        <div className="h-8 w-8 bg-white rounded-md flex justify-center items-center">
-          <CgProfile className="h-6 w-auto text-slate-700/60" />
-        </div>
-      </div>
+      <ProfileNavbar />
     </div>
   )
 }

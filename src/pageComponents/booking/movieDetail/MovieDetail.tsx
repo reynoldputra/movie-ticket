@@ -1,5 +1,4 @@
 import Cell from "@/components/layout/cell";
-import Grid from "@/components/layout/grid";
 import Image from "next/image"
 
 export default function MovieDetail() {
@@ -14,23 +13,19 @@ export default function MovieDetail() {
   }
 
   return (
-    <Grid>
-      <Cell cols="3_8" className="mt-28 flex justify-center items-center">
-        <div className="w-64 aspect-[3/4] relative">
-          <Image src={movie.poster_url} fill className="object-contain" alt="movie poster" />
+    <Cell cols="1_6" className="flex flex-col items-center">
+      <div className="w-64 aspect-[3/4] relative">
+        <Image src={movie.poster_url} fill className="object-contain" alt="movie poster" />
+      </div>
+      <div className="w-full text-center text-sm max-w-sm">
+        <p className="text-lg font-bold">{movie.title}</p>
+        <div className="flex justify-center gap-3 text-slate-400">
+          <p>Rp {movie.ticket_price}</p>
+          <p>|</p>
+          <p>{movie.age_rating} + </p>
         </div>
-      </Cell>
-      <Cell cols="5_4">
-        <div className="w-full text-center text-sm">
-          <p className="text-lg font-bold">{movie.title}</p>
-          <div className="flex justify-center gap-3 text-slate-400">
-            <p>Rp {movie.ticket_price}</p>
-            <p>|</p>
-            <p>{movie.age_rating} + </p>
-          </div>
-          <p className="mt-4">{movie.description}</p>
-        </div>
-      </Cell>
-    </Grid>
+        <p className="mt-4">{movie.description}</p>
+      </div>
+    </Cell>
   )
 }

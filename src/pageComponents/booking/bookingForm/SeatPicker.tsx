@@ -5,10 +5,10 @@ import { useState } from "react";
 export default function SeatPicker() {
   const rows = ["A", "B", "C", "D", "E", "F", "G", "H"]
   const cols = [1, 2, 3, 4, 5, 6, 7, 8]
-  const [seats, setSeats] = useState<string[]>([]) 
-  
-  const onClickSeatHandle = (seat : string) => {
-    if(seats.includes(seat)) {
+  const [seats, setSeats] = useState<string[]>([])
+
+  const onClickSeatHandle = (seat: string) => {
+    if (seats.includes(seat)) {
       let newSeats = seats.filter(seatState => seatState != seat)
       setSeats(newSeats)
     } else {
@@ -36,9 +36,10 @@ export default function SeatPicker() {
             <div className="w-8 h-8 flex justify-center items-center">{row}</div>
             {cols.map((col, colIdx) => (
               <div key={colIdx} className={clsxm(
-                "w-8 h-8 bg-gray-200 flex justify-center transition-all items-center",
-                (seats.includes(row+col) && "bg-cyan-400")
-              )} onClick={() => onClickSeatHandle(row+col)}>
+                "w-8 h-8 bg-gray-200 flex justify-center transition-all items-center text-gray-500 text-xs",
+                (seats.includes(row + col) && "bg-cyan-400 text-slate-600")
+              )} onClick={() => onClickSeatHandle(row + col)}>
+                {row + col}
               </div>
             ))}
             <div className="w-8 h-8"></div>

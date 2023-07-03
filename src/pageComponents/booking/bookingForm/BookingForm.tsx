@@ -1,4 +1,3 @@
-import Grid from "@/components/layout/grid";
 import Cell from "@/components/layout/cell";
 import { Item } from "@/interfaces/DropdownItems"
 import DropdownInput from "@/components/form/DropdownInput";
@@ -24,30 +23,29 @@ export default function BookingForm() {
   ]
 
   return (
-    <Grid>
-      <Cell cols="1_full" className="flex justify-center">
-        <p className="text-xl font-bold">Grab Your Tickets</p>
-      </Cell>
-      <Cell cols="2_10" className="pt-10">
-        <div>
-          <label className="font-bold">Teater</label>
-          <DropdownInput items={teaters} />
-        </div>
-        <div className="mt-8">
-          <label className="font-bold">Date</label>
-          <Modal title="Select a Date">
-            <DayPicker mode="single" />
-          </Modal>
-        </div>
-        <div className="mt-8">
-          <label className="font-bold">Time</label>
-          <DropdownInput items={times} />
-        </div>
-        <div className="mt-8">
-          <label className="font-bold">Seat</label>
-          <SeatPicker />
-        </div>
-      </Cell>
-    </Grid>
+    <Cell cols="8_full" className="">
+      <p className="text-2xl font-bold mb-8">Grab Your Tickets</p>
+      <div>
+        <label className="font-bold">Teater</label>
+        <DropdownInput items={teaters} />
+      </div>
+      <div className="mt-6">
+        <label className="font-bold">Date</label>
+        <Modal title="Select a Date">
+          <DayPicker mode="single" />
+        </Modal>
+      </div>
+      <div className="mt-6">
+        <label className="font-bold">Time</label>
+        <DropdownInput items={times} />
+      </div>
+      <div className="mt-6">
+        <label className="font-bold">Seat</label>
+        <SeatPicker />
+      </div>
+      <div className="py-2 px-6 w-fit h-fit mt-8 bg-cyan-500 font-bold rounded-md">
+        Buy
+      </div>
+    </Cell>
   )
 }
