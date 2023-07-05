@@ -1,35 +1,30 @@
-import { FunctionComponent } from "react"
-import Image from "next/image"
+import { FunctionComponent } from "react";
+import Image from "next/image";
+import { Movie } from "@/interfaces/Movie";
 
 interface MovieCardProps {
-  id: number
-  title: string
-  release_date: Date
-  poster: string
-  age: Number
-  price: Number
+  movie: Movie;
 }
 
-const MovieCard: FunctionComponent<MovieCardProps> = (props) => {
+const MovieCard: FunctionComponent<MovieCardProps> = ({ movie }) => {
   return (
     <div className="w-48">
       <div className="w-48 aspect-[3/4.5] relative">
-        <Image src={props.poster} fill className="object-contain" alt="movie poster" />
+        <Image src={movie.poster_url} fill className="object-contain" alt="movie poster" />
       </div>
       <div className="mt-4 text-sm">
         <div className="w-full flex justify-between gap-4">
-          <p className="font-bold">{props.title}</p>
-          <p className="font-bold text-cyan-300">{props.age.toString()}+</p>
+          <p className="font-bold">{movie.title}</p>
+          <p className="font-bold text-cyan-300">{movie.age_rating}+</p>
         </div>
         <div className="w-full flex gap-2 text-slate-400 text-xs mt-3">
-          <p>{props.release_date.getFullYear()}</p>
+          <p>{movie.release_date.getFullYear()}</p>
           <p>|</p>
-          <p>Rp {props.price.toString()}</p>
+          <p>Rp {movie.price.toString()}</p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MovieCard
-
+export default MovieCard;

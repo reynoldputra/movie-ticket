@@ -1,15 +1,16 @@
 import Cell from "@/components/layout/cell";
+import { Movie } from "@/interfaces/Movie";
 import Image from "next/image"
 
 export default function MovieDetail() {
-  const movie = {
+  const movie : Movie = {
     "id": 0,
     "title": "Fast X",
     "description": "Dom Toretto dan keluarganya menjadi sasaran putra gembong narkoba Hernan Reyes yang pendendam.",
-    "release_date": "2023-05-17",
+    "release_date": new Date("2023-05-17"),
     "poster_url": "https://image.tmdb.org/t/p/w500/fiVW06jE7z9YnO4trhaMEdclSiC.jpg",
     "age_rating": 15,
-    "ticket_price": 53000
+    "price": 53000
   }
 
   return (
@@ -20,7 +21,7 @@ export default function MovieDetail() {
       <div className="w-full text-center text-sm max-w-sm">
         <p className="text-lg font-bold">{movie.title}</p>
         <div className="flex justify-center gap-3 text-slate-400">
-          <p>Rp {movie.ticket_price}</p>
+          <p>Rp {movie.price}</p>
           <p>|</p>
           <p>{movie.age_rating} + </p>
         </div>

@@ -1,55 +1,60 @@
 # Movie Ticket
+
+
+
 ## Frontend
 
 ### Auth
-
-- - [ ] Login 
-- - [ ] Register
-- - [ ] Authorization
+- [x] Login 
+- [x] Register
+- [ ] Authorization
 
 ### Movie
-- :white_check_mark: View all movies
-- :white_check_mark: Movie detail
+- [x] View all movies
+- [x] Movie detail
 
 ### Ticket
-- :white_check_mark: Booking ticket form
-- :white_check_mark: Ticket history (active ticket, and waiting payment)
-- - [ ] Detail ticket
- w
+- [x] Booking ticket form
+- [x] Ticket history (active ticket, and waiting payment)
+- [x] Detail ticket
+ 
 ### Balance
-- - [ ] Top up and withdraw page
+- [x] Top up page
+- [] Withdraw page
 
 ### Transaction
-- :white_check_mark: Payment page form (pay booked ticket)
-- :white_check_mark: Transaction waiting / active
-- :white_check_mark: Transaction history
-- :white_check_mark: Detail transaction
+- [x] Payment page form (pay booked ticket)
+- [x] Transaction waiting / active
+- [x] Transaction history
+- [x] Detail transaction
+
+
 
 
 ## Backend
-- - [ ] Payment history 
+- [ ] Payment history 
 
 ### Auth
-- - [ ] Login
-- - [ ] Register
-- - [ ] Authorization
+- [ ] Login
+- [ ] Register
+- [ ] Authorization
 
 ### Movie
-- - [ ] GET all movies
-- - [ ] GET movie detail
+- [ ] GET all movies
+- [ ] GET movie detail
 
 ### Ticket
-- - [ ] GET theater available
-- - [ ] GET ticket available (seats, time and date)
-- - [ ] POST booking ticket
-- - [ ] GET user tickets
+- [ ] GET theater available
+- [ ] GET ticket available (seats, time and date)
+- [ ] POST booking ticket
+- [ ] GET user tickets
 
 ### Balance
-- - [ ] GET user balance info 
-- - [ ] POST top up
-- - [ ] POST withdraw
+- [ ] GET user balance info 
+- [ ] POST top up
+- [ ] POST withdraw
 
 ### Payment
-- - [ ] GET payment history
-- - [ ] POST pay transaction
-- - [ ] POST cancel transaction
+- [ ] GET payment history
+- [ ] POST pay transaction
+- [ ] POST cancel transaction

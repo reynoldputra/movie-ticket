@@ -1,4 +1,5 @@
 import { Popover, Transition } from '@headlessui/react'
+import Link from 'next/link'
 import { Fragment } from 'react'
 import { BiLogOut } from 'react-icons/bi'
 import { CgProfile } from 'react-icons/cg'
@@ -46,18 +47,20 @@ export default function ProfileNavbar() {
                     </div>
                   </div>
                   <div className='py-2 bg-white'>
-                    <div
-                      className="flex items-center px-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
-                    >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center text-white sm:h-12 sm:w-12">
-                        <MdPayments className="text-green-400 h-6 w-6" />
+                    <Link href="/topup">
+                      <div
+                        className="flex items-center px-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center text-white sm:h-12 sm:w-12">
+                          <MdPayments className="text-green-400 h-6 w-6" />
+                        </div>
+                        <div className="ml-4">
+                          <p className="text-sm font-medium text-black">
+                            Top up
+                          </p>
+                        </div>
                       </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-black">
-                          Top up
-                        </p>
-                      </div>
-                    </div>
+                    </Link>
                     <div
                       className="flex items-center px-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
                     >

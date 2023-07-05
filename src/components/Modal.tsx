@@ -23,9 +23,9 @@ export default function Modal({ children, title }: ModalProps) {
         <button
           type="button"
           onClick={openModal}
-          className="rounded-md bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+          className="rounded-md bg-gray-200 px-3 py-2 text-sm text-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
         >
-          Open dialog
+          {title}
         </button>
       </div>
 

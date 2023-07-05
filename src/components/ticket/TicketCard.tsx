@@ -14,7 +14,7 @@ export default function TicketCard({ ticket, className = "" }: TicketCardProps) 
       className
     ])}>
       <div className="w-full flex justify-between text-lg font-bold">
-        <p>{ticket.movie_title}</p>
+        <p>{ticket.movie.title}</p>
         <p>{ticket.count_ticket}</p>
       </div>
       <div className="w-full flex justify-between text-sm text-slate-500">

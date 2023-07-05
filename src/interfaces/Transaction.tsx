@@ -10,6 +10,7 @@ interface Transaction {
 
 export interface TicketTrans extends Transaction {
   validDate: Date;
+  paymentMethod : string;
 }
 
 export interface TransHistory extends Transaction {
