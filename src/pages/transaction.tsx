@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout";
-import Transaction from "@/pageComponents/transaction/transaction";
+import Transaction from "@/pageComponents/transaction/Transaction";
 
 export default function TransactionPage () {
   return (

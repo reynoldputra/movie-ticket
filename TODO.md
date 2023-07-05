@@ -14,7 +14,8 @@
 ### Ticket
 - :white_check_mark: Booking ticket form
 - :white_check_mark: Ticket history (active ticket, and waiting payment)
-
+- - [ ] Detail ticket
+ w
 ### Balance
 - - [ ] Top up and withdraw page
 
@@ -22,6 +23,7 @@
 - - [ ] Payment page form (pay booked ticket)
 - :white_check_mark: Transaction waiting / active
 - - [ ] Transaction history
+- - [ ] Detail transaction
 
 
 ## Backend

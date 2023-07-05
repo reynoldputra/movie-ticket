@@ -6,14 +6,13 @@ export interface StatusType {
 interface Transaction {
   uid: string;
   cash: number;
-  isIn: boolean;
 }
 
 export interface TicketTrans extends Transaction {
   validDate: Date;
 }
 
-export interface CompletedTrans extends Transaction {
+export interface TransHistory extends Transaction {
   date: Date;
   status: StatusType;
   type: string;
