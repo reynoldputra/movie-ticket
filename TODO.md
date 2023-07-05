@@ -20,10 +20,10 @@
 - - [ ] Top up and withdraw page
 
 ### Transaction
-- - [ ] Payment page form (pay booked ticket)
+- :white_check_mark: Payment page form (pay booked ticket)
 - :white_check_mark: Transaction waiting / active
-- - [ ] Transaction history
-- - [ ] Detail transaction
+- :white_check_mark: Transaction history
+- :white_check_mark: Detail transaction
 
 
 ## Backend

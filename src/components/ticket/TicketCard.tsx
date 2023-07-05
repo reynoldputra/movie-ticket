@@ -4,7 +4,7 @@ import clsxm from "@/lib/clsxm";
 
 interface TicketCardProps {
   ticket: Ticket,
-  className : string
+  className? : string
 }
 
 export default function TicketCard({ ticket, className = "" }: TicketCardProps) {

@@ -8,20 +8,24 @@ import { Ticket } from "@/interfaces/Ticket";
 export default function Ticket() {
   const tickets: Ticket[] = [
     {
+      uid: "asdas1231",
       movie_title: "John Wick: Chapter 4",
       time: "12.05",
       date: new Date("3-5-2023"),
       teater: "XXI PAKUWON CITY MALL",
       count_ticket: 4,
       orderId: "weqe121eqw",
+      qr_url : ""
     },
     {
+      uid: "asdas1231",
       movie_title: "John Wick: Chapter 4",
       time: "12.05",
       date: new Date("3-5-2023"),
       teater: "XXI PAKUWON CITY MALL",
       count_ticket: 4,
       orderId: "ada123jia",
+      qr_url : ""
     },
   ];
 
