@@ -20,7 +20,7 @@
  
 ### Balance
 - [x] Top up page
-- [] Withdraw page
+- [x] Withdraw page
 
 ### Transaction
 - [x] Payment page form (pay booked ticket)
