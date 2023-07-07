@@ -8,7 +8,7 @@ export default function validationExceptionHandler(
 ) {
   const newError = [];
   const errors = error.errors;
-  if(errors) {
+  if (errors) {
     for (let idx in errors) {
       const words = errors[idx].split(" ");
       const target = words[0];
@@ -16,9 +16,11 @@ export default function validationExceptionHandler(
       const message = words.join(" ");
       newError.push({
         target,
-        message
+        message,
       });
     }
+    res.status(400).json({ status: false, message: "Input not valid", error: newError });
   }
-  res.status(200).json({ success: false, message: "Input form not valid", error: newError });
+  const message = error instanceof Error ? error.message : "An unknown error occurred.";
+  res.status(400).json({ status: false, message });
 }
