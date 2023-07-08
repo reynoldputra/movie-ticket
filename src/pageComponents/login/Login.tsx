@@ -19,7 +19,7 @@ export default function Login() {
   ]
 
   return (
-    <Grid className="pt-32">
+    <Grid className="py-32">
       <Cell cols="1_full" className="flex justify-center">
         <Tabs items={AuthTab} />
       </Cell>
