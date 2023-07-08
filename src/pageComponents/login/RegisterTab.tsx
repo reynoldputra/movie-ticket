@@ -1,6 +1,8 @@
+import ErrorForm from "@/components/form/ErrorForm";
 import { InputItem } from "@/interfaces/InputItem";
 import { registerPost } from "@/lib/client/registerPost";
 import { RegisterOptions, SubmitHandler, Validate, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 interface RegisterInput {
   email: string;
@@ -20,7 +22,9 @@ export default function RegisterTab() {
   } = useForm<RegisterInput>();
 
   const onSubmit: SubmitHandler<RegisterInput> = (data) => {
-    // registerPost(data);
+    console.log(data)
+    // toast("test")
+    registerPost(data);
   };
 
   const checkPassword = (val: string) => {
@@ -66,7 +70,7 @@ export default function RegisterTab() {
                   type={form.type ? form.type : "text"}
                   {...register(form.name as keyof RegisterInput, registerOption)}
                 />
-                {errors[form.name as keyof RegisterInput] && <p className="text-sm text-red-500">{errors[form.name as keyof RegisterInput]?.message}</p>}
+                {errors[form.name as keyof RegisterInput] && <ErrorForm message={errors[form.name as keyof RegisterInput]?.message as string} /> }
               </>
             );
           })}
