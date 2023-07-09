@@ -1,8 +1,7 @@
 import ErrorForm from "@/components/form/ErrorForm";
 import { InputItem } from "@/interfaces/InputItem";
 import { registerPost } from "@/lib/client/registerPost";
-import { RegisterOptions, SubmitHandler, Validate, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { RegisterOptions, SubmitHandler, useForm } from "react-hook-form";
 
 interface RegisterInput {
   email: string;
@@ -22,8 +21,7 @@ export default function RegisterTab() {
   } = useForm<RegisterInput>();
 
   const onSubmit: SubmitHandler<RegisterInput> = (data) => {
-    console.log(data)
-    // toast("test")
+    console.log(data);
     registerPost(data);
   };
 
@@ -36,19 +34,19 @@ export default function RegisterTab() {
   };
 
   const forms: InputItem[] = [
-    { name: "name", label: "Name", required: true },
-    { name: "username", label: "Username", required: true },
-    { name: "email", label: "Email", required: true, type: "email" },
-    { name: "age", label: "Age", required: true, type: "number" },
-    { name: "password", label: "Password", required: true, type: "password" },
+    { name: "name", label: "Name", option: { required: true } },
+    { name: "username", label: "Username", option: { required: true } },
+    { name: "email", label: "Email", type: "email", option: { required: true } },
+    { name: "age", label: "Age", type: "number", option: { required: true } },
+    { name: "password", label: "Password", type: "password", option: { required: true } },
     {
       name: "confirmPassword",
       label: "Confirm Password",
-      required: true,
       type: "password",
-      option : {
-        validate: checkPassword
-      }
+      option: {
+        validate: checkPassword,
+        required: true,
+      },
     },
   ];
 
@@ -57,7 +55,7 @@ export default function RegisterTab() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
           {forms.map((form) => {
-            let registerOption: RegisterOptions = {}
+            let registerOption: RegisterOptions = {};
 
             if (form.option) registerOption = form.option;
 
@@ -70,7 +68,11 @@ export default function RegisterTab() {
                   type={form.type ? form.type : "text"}
                   {...register(form.name as keyof RegisterInput, registerOption)}
                 />
-                {errors[form.name as keyof RegisterInput] && <ErrorForm message={errors[form.name as keyof RegisterInput]?.message as string} /> }
+                {errors[form.name as keyof RegisterInput] && (
+                  <ErrorForm
+                    message={errors[form.name as keyof RegisterInput]?.type == "required" ? "This field is required" : errors[form.name as keyof RegisterInput]?.message as string}
+                  />
+                )}
               </>
             );
           })}

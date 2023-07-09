@@ -1,5 +1,5 @@
 export class ResponseDTO {
-  status!: boolean;
+  status?: boolean = true;
   message!: string;
   data?: unknown;
 }

@@ -9,7 +9,8 @@ export const registerPost = async (value: Object) => {
     toast.update(id, {
       render : "Success creating new user",
       type : "success",
-      isLoading : false
+      isLoading : false,
+      autoClose : 3000
     })
   } catch (err) {
     if(err instanceof AxiosError) {
@@ -17,7 +18,8 @@ export const registerPost = async (value: Object) => {
       toast.update(id, {
         render : err.response?.data?.message,
         type : "error",
-        isLoading : false
+        isLoading : false,
+        autoClose : 3000
       })
     }
   }
