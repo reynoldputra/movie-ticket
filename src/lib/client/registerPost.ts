@@ -1,11 +1,12 @@
 import { toast } from "react-toastify"
 import nextApi from "./api"
 import { AxiosError } from "axios"
+import { RegisterInput } from "@/interfaces/FormInterface"
 
-export const registerPost = async (value: Object) => {
+export const registerPost = async (value: RegisterInput) => {
   const id = toast.loading("Sending data ...")
   try {
-    await nextApi().post("/api/auth/register", value)  
+    await nextApi().post("/api/myauth/register", value)  
     toast.update(id, {
       render : "Success creating new user",
       type : "success",

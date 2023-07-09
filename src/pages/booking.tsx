@@ -1,3 +1,4 @@
+import * as bcrypt from "bcryptjs"
 import Layout from "@/components/Layout";
 import Booking from "@/pageComponents/booking/Booking";
 

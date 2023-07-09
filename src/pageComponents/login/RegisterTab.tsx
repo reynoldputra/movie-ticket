@@ -1,16 +1,9 @@
 import ErrorForm from "@/components/form/ErrorForm";
+import { RegisterInput } from "@/interfaces/FormInterface";
 import { InputItem } from "@/interfaces/InputItem";
 import { registerPost } from "@/lib/client/registerPost";
 import { RegisterOptions, SubmitHandler, useForm } from "react-hook-form";
 
-interface RegisterInput {
-  email: string;
-  name: string;
-  username: string;
-  age: number;
-  password: string;
-  confirmPassword: string;
-}
 
 export default function RegisterTab() {
   const {
