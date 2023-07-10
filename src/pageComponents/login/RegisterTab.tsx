@@ -1,8 +1,8 @@
 import ErrorForm from "@/components/form/ErrorForm";
-import { RegisterInput } from "@/interfaces/FormInterface";
+import { RegisterInput } from "@/interfaces/FormInput";
 import { InputItem } from "@/interfaces/InputItem";
 import { registerPost } from "@/lib/client/registerPost";
-import { RegisterOptions, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 
 export default function RegisterTab() {
@@ -14,7 +14,6 @@ export default function RegisterTab() {
   } = useForm<RegisterInput>();
 
   const onSubmit: SubmitHandler<RegisterInput> = (data) => {
-    console.log(data);
     registerPost(data);
   };
 
@@ -30,7 +29,7 @@ export default function RegisterTab() {
     { name: "name", label: "Name", option: { required: true } },
     { name: "username", label: "Username", option: { required: true } },
     { name: "email", label: "Email", type: "email", option: { required: true } },
-    { name: "age", label: "Age", type: "number", option: { required: true } },
+    { name: "age", label: "Age", type: "number", option: { required: true, valueAsNumber: true } },
     { name: "password", label: "Password", type: "password", option: { required: true } },
     {
       name: "confirmPassword",
@@ -48,10 +47,6 @@ export default function RegisterTab() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
           {forms.map((form) => {
-            let registerOption: RegisterOptions = {};
-
-            if (form.option) registerOption = form.option;
-
             return (
               <>
                 <p className="font-bold mt-2">{form.label}</p>
@@ -59,7 +54,7 @@ export default function RegisterTab() {
                   className="bg-gray-200 px-4 py-1 rounded-md"
                   id={form.name}
                   type={form.type ? form.type : "text"}
-                  {...register(form.name as keyof RegisterInput, registerOption)}
+                  {...register(form.name as keyof RegisterInput, form.option)}
                 />
                 {errors[form.name as keyof RegisterInput] && (
                   <ErrorForm
@@ -70,8 +65,8 @@ export default function RegisterTab() {
             );
           })}
         </div>
-        <button className="w-full">
-          <div className="bg-blue-600 text-white text-center font-bold py-1 mt-4">Register</div>
+        <button className="w-full" type="submit">
+          <div className="bg-blue-600 rounded text-white text-center font-bold py-1 mt-4">Register</div>
         </button>
       </form>
     </div>
