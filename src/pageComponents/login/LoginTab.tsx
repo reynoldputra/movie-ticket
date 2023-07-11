@@ -1,10 +1,12 @@
 import ErrorForm from "@/components/form/ErrorForm";
 import { LoginInput } from "@/interfaces/FormInput";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 export default function LoginTab() {
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -31,12 +33,12 @@ export default function LoginTab() {
       return;
     }
     toast.update(id, {
-      render: "Success creating new user",
+      render: "Login success",
       type: "success",
       isLoading: false,
       autoClose: 3000,
     });
-    
+    router.push(res.url as string)
   };
 
   return (

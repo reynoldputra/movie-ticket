@@ -7,6 +7,10 @@ import { Adapter } from "next-auth/adapters";
 
 export default NextAuth({
   adapter: PrismaAdapter(prisma) as Adapter,
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+  },
   providers: [
     CredentialsProvider({
       id: "credentials",
@@ -19,14 +23,12 @@ export default NextAuth({
         const user = await prisma.user
           .findFirst({
             where: {
-              email: credentials?.email
-            }
+              email: credentials?.email,
+            },
           })
           .catch(() => {
             return null;
           });
-
-        console.log(user)
 
         if (!user) return null;
 
@@ -37,8 +39,32 @@ export default NextAuth({
         return {
           id: user.id,
           name: user.name,
+          balance : user.balance
         };
       },
     }),
   ],
+  callbacks: {
+    session: ({ session, token }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id,
+          randomkey: token.randomkey
+        },
+      };
+    },
+    jwt: async ({ token, user }) => {
+      if (user) {
+        const u = user as unknown as any
+        return {
+          ...token,
+          id: u.id,
+          randomkey: u.randomkey
+        };
+      }
+      return token;
+    },
+  },
 });

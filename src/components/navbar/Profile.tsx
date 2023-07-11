@@ -1,15 +1,13 @@
 import { Popover, Transition } from '@headlessui/react'
+import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { BiLogOut } from 'react-icons/bi'
 import { CgProfile } from 'react-icons/cg'
 import { MdPayments } from 'react-icons/md'
 
-
-
-export default function ProfileNavbar() {
+export default function ProfileNavbar({username, id} : {username : string, id : string}) {
   return (
-    <div className="w-64">
       <Popover className="relative">
         {({ open }) => (
           <>
@@ -18,7 +16,7 @@ export default function ProfileNavbar() {
                 ${open ? '' : 'text-opacity-90'}
                 h-full flex items-center justify-center text-white gap-6`}
             >
-              <p className="font-bold">Username</p>
+              <p className="font-bold">{username}</p>
               <div className="h-8 w-8 bg-white rounded-md flex justify-center items-center">
                 <CgProfile className="h-6 w-auto text-gray-400/90" />
               </div>
@@ -42,7 +40,7 @@ export default function ProfileNavbar() {
                         My balance
                       </span>
                       <span className="text-sm font-medium text-gray-900">
-                        IDR 200.000
+                        IDR 0
                       </span>
                     </div>
                   </div>
@@ -62,7 +60,8 @@ export default function ProfileNavbar() {
                       </div>
                     </Link>
                     <div
-                      className="flex items-center px-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                      className="flex items-center px-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50 cursor-pointer"
+                      onClick={() => signOut()}
                     >
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center text-white sm:h-12 sm:w-12">
                         <BiLogOut className="text-red-400 h-6 w-6" />
@@ -80,6 +79,5 @@ export default function ProfileNavbar() {
           </>
         )}
       </Popover>
-    </div>
   )
 }

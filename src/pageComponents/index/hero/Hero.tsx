@@ -37,7 +37,7 @@ export default function Hero() {
 
   return (
     <section className="w-full min-h-screen flex justify-center items-center relative">
-      <Grid screenHeight={false}>
+      <Grid screenHeight={false} className="w-full">
         <Cell cols="1_full" className="relative z-10 flex justify-center">
           <div className="w-[400px] text-center">
             <p className="text-sm text-slate-200">{movies[currentMovie].description}</p>

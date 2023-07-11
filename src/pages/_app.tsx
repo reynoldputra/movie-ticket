@@ -6,7 +6,7 @@ import { SessionProvider } from "next-auth/react";
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
-    <SessionProvider>
+    <SessionProvider session={pageProps.session}>
       <Component {...pageProps} />
       <ToastContainer
         position="bottom-right"

@@ -22,6 +22,18 @@ model User {
   sessions Session[]
 }
 
+// main
+model Movie {
+  id           Int      @id @default(autoincrement())
+  title        String
+  slug         String   @unique
+  release_date DateTime
+  poster_url   String
+  age_rating   Int
+  price        Int
+  description  String   @db.Text
+}
+
 // next auth
 model Account {
   id                String  @id @default(cuid())

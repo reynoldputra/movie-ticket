@@ -7,7 +7,8 @@
 ### Auth
 - [x] Login 
 - [x] Register
-- [ ] Authorization
+- [ ] Authorization redirect to login
+- [ ] Authorization redirect from login
 
 ### Movie
 - [x] View all movies
@@ -31,13 +32,17 @@
 
 
 
+
+
+
+
+
 ## Backend
-- [ ] Payment history 
 
 ### Auth
-- [ ] Login
-- [ ] Register
-- [ ] Authorization
+- [x] Login
+- [x] Register
+- [x] Authorization => using next-auth
 
 ### Movie
 - [ ] GET all movies
