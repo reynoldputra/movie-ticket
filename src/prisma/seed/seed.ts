@@ -1,37 +1,82 @@
-import { PrismaClient } from "@prisma/client"
-import movieData from "./data/movies.json" assert { type : "json"}
-import slugify from "slugify"
-import { parse } from "path"
-const prisma = new PrismaClient()
+import { Movie, PrismaClient, Schedule, Teater } from "@prisma/client";
+import movieData from "./data/movies.json" assert { type: "json" };
+import teaterData from "./data/teater.json" assert { type: "json" };
+import slugify from "slugify";
+import { randomPicker, pickUniqueNumbers } from "../../lib/helper";
+const prisma = new PrismaClient();
 
-async function main () {
-  for(let idx in movieData) {
-    const movie = movieData[idx]
-    const date = new Date(movie.release_date)
+async function main() {
+  for (let idx in movieData) {
+    const movie = movieData[idx];
+    const date = new Date(movie.release_date);
     const parsedTitle = movie.title.replace(/[^a-zA-Z\s]/g, "").toLowerCase();
-    const slug = slugify(parsedTitle, "-")
+    const slug = slugify(parsedTitle, "-");
+    const newMovie: Movie = {
+      id: parseInt(idx),
+      title: movie.title,
+      slug: slug,
+      release_date: date,
+      description: movie.description,
+      age_rating: movie.age_rating,
+      price: movie.ticket_price,
+      poster_url: movie.poster_url,
+    };
     await prisma.movie.upsert({
-      where : { slug : slug },
-      update : {},
-      create : {
-        title : movie.title,
-        slug : slug,
-        release_date : date,
-        description : movie.description,
-        age_rating : movie.age_rating,
-        price : movie.ticket_price,
-        poster_url : movie.poster_url
+      where: { slug: slug },
+      update: newMovie,
+      create: newMovie,
+    });
+  }
+
+  for (let idx in teaterData) {
+    const teater = teaterData[idx];
+    const newTeater: Teater = {
+      id: teater.id,
+      name: teater.name,
+      city: teater.city,
+    };
+    await prisma.teater.upsert({
+      where: { id: teater.id },
+      update: newTeater,
+      create: newTeater,
+    });
+  }
+
+  let id = 1;
+  for (let i in movieData) {
+    const minutes = [15, 20, 30, 45, 55];
+    for (let j in teaterData) {
+      const hours = pickUniqueNumbers(11, 22, 6);
+      for (let h in hours) {
+        let hour = hours[h];
+        const minute = minutes[randomPicker(0, minutes.length - 1)];
+        hour = hour < 10 ? 0 + hour : hour;
+        let dateObj = new Date();
+        dateObj.setUTCHours(hour, minute, 0, 0);
+        let time = dateObj;
+        const newSchedule: Schedule = {
+          id,
+          teaterId: teaterData[j].id,
+          movieId: movieData[i].id,
+          time,
+        };
+        await prisma.schedule.upsert({
+          where: { id: newSchedule.id },
+          update: newSchedule,
+          create: newSchedule,
+        });
+        id++;
       }
-    })
+    }
   }
 }
 
 main()
   .then(async () => {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

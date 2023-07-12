@@ -47,7 +47,7 @@ model Teater {
 model Schedule {
   id       Int      @id @default(autoincrement())
   teaterId Int
-  time     DateTime
+  time     DateTime @db.Time()
   movieId  Int
   teater   Teater   @relation(fields: [teaterId], references: [id])
   movie    Movie    @relation(fields: [movieId], references: [id])

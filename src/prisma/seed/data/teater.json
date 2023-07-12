@@ -1,0 +1,9 @@
+[
+  { "id" : 1, "name": "Pakuwon City Mall", "city" : "Surabaya" },
+  { "id" : 2,"name": "Pakuwon Trade Center", "city" : "Surabaya" },
+  { "id" : 3,"name": "City of Tomorrow", "city" : "Surabaya" },
+  { "id" : 4,"name": "Tujungan Plaza", "city" : "Surabaya" },
+  { "id" : 5,"name": "Galaxy Mall", "city" : "Surabaya" },
+  { "id" : 6,"name": "Malang Town Square", "city" : "Malang" },
+  { "id" : 7,"name": "Mall Olympic Garden", "city" : "Malang" }
+]
