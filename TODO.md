@@ -7,6 +7,7 @@
 ### Auth
 - [x] Login 
 - [x] Register
+- [x] Navbar authenticated condition
 - [ ] Authorization redirect to login
 - [ ] Authorization redirect from login
 
@@ -33,10 +34,6 @@
 
 
 
-
-
-
-
 ## Backend
 
 ### Auth
@@ -45,8 +42,9 @@
 - [x] Authorization => using next-auth
 
 ### Movie
-- [ ] GET all movies
-- [ ] GET movie detail
+- [x] GET all movies
+- [x] GET movie detail by id
+- [x] GET movie detail by slug
 
 ### Ticket
 - [ ] GET theater available

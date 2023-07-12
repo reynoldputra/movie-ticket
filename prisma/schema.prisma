@@ -11,27 +11,74 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(cuid())
-  email    String    @unique
-  username String    @unique
-  name     String
-  age      Int
-  balance  Int
-  password String
-  accounts Account[]
-  sessions Session[]
+  id           String        @id @default(cuid())
+  email        String        @unique
+  username     String        @unique
+  name         String
+  age          Int
+  balance      Int
+  password     String
+  accounts     Account[]
+  sessions     Session[]
+  tickets      Ticket[]
+  transactions Transaction[]
 }
 
 // main
 model Movie {
-  id           Int      @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   title        String
-  slug         String   @unique
+  slug         String     @unique
   release_date DateTime
   poster_url   String
   age_rating   Int
   price        Int
-  description  String   @db.Text
+  description  String     @db.Text
+  schedules    Schedule[]
+}
+
+model Teater {
+  id        Int        @id @default(autoincrement())
+  name      String
+  city      String
+  schedules Schedule[]
+}
+
+model Schedule {
+  id       Int      @id @default(autoincrement())
+  teaterId Int
+  time     DateTime
+  movieId  Int
+  teater   Teater   @relation(fields: [teaterId], references: [id])
+  movie    Movie    @relation(fields: [movieId], references: [id])
+  tickets  Ticket[]
+}
+
+model Ticket {
+  id         Int      @id @default(autoincrement())
+  scheduleId Int
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  paymentId  String
+  Payment    Payment  @relation(fields: [paymentId], references: [id])
+}
+
+model Payment {
+  id       String        @id @default(cuid())
+  tickets  Ticket[]
+  due_date DateTime
+  status   PaymentStatus
+  method   PaymentMethod
+}
+
+model Transaction {
+  id     Int             @id @default(autoincrement())
+  date   DateTime
+  userId String
+  user   User            @relation(fields: [userId], references: [id])
+  amount Int
+  type   TransactionType
 }
 
 // next auth
@@ -68,4 +115,21 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum PaymentMethod {
+  BCA
+  QRIS
+}
+
+enum TransactionType {
+  BUYTICKET @map("Buy Ticket")
+  TOPUP     @map("Top Up")
+  WITHDRAW  @map("Withdraw")
+}
+
+enum PaymentStatus {
+  WAITING  @map("Waiting")
+  FAILED   @map("Failed")
+  COMPLETE @map("Complete")
 }
