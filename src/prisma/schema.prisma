@@ -55,7 +55,7 @@ model Schedule {
 }
 
 model Ticket {
-  id         String      @id @default(cuid())
+  id         String   @id @default(cuid())
   scheduleId Int
   userId     String
   paymentId  String
@@ -63,24 +63,28 @@ model Ticket {
   seat       Int
   user       User     @relation(fields: [userId], references: [id])
   schedule   Schedule @relation(fields: [scheduleId], references: [id])
-  sayment    Payment  @relation(fields: [paymentId], references: [id])
+  payment    Payment  @relation(fields: [paymentId], references: [id])
 }
 
 model Payment {
-  id       String        @id @default(cuid())
-  tickets  Ticket[]
-  due_date DateTime
-  status   PaymentStatus
-  method   PaymentMethod
+  id            String        @id @default(cuid())
+  tickets       Ticket[]
+  due_date      DateTime
+  userId        String
+  status        PaymentStatus
+  method        PaymentMethod
+  transactionId Int?          @unique
+  transaction   Transaction?  @relation(fields: [transactionId], references: [id])
 }
 
 model Transaction {
-  id     Int             @id @default(autoincrement())
-  date   DateTime
-  userId String
-  user   User            @relation(fields: [userId], references: [id])
-  amount Int
-  type   TransactionType
+  id      Int             @id @default(autoincrement())
+  date    DateTime
+  userId  String
+  user    User            @relation(fields: [userId], references: [id])
+  amount  Int
+  type    TransactionType
+  payment Payment?
 }
 
 // next auth

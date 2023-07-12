@@ -20,18 +20,20 @@ class Ticket {
       const session = await checkSession()
       const userId = session.user.id
       const currentDateTime = new Date()
-      const res = await prisma.ticket.findMany({
+      const res = await prisma.payment.findMany({
         where : {
           userId,
-          payment : {
-            status : "COMPLETE"
-          },
-          date : {
-            gt : currentDateTime
-          },
-          schedule : {
-            time : {
-              gt : currentDateTime
+          status : "COMPLETE",
+          tickets : {
+            some : {
+              date : {
+                gt : currentDateTime
+              },
+              schedule : {
+                time : {
+                  gt : currentDateTime
+                }
+              }
             }
           }
         }
@@ -54,18 +56,20 @@ class Ticket {
       const session = await checkSession()
       const userId = session.user.id
       const currentDateTime = new Date()
-      const res = await prisma.ticket.findMany({
+      const res = await prisma.payment.findMany({
         where : {
           userId,
-          payment : {
-            status : "COMPLETE"
-          },
-          date : {
-            lt : currentDateTime
-          },
-          schedule : {
-            time : {
-              lt : currentDateTime
+          status : "COMPLETE",
+          tickets : {
+            some : {
+              date : {
+                lt : currentDateTime
+              },
+              schedule : {
+                time : {
+                  lt : currentDateTime
+                }
+              }
             }
           }
         }

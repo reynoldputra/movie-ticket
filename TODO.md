@@ -58,6 +58,6 @@
 - [ ] POST withdraw
 
 ### Payment
-- [ ] GET payment history
+- [x] GET payment history
 - [ ] POST pay transaction
 - [ ] POST cancel transaction
