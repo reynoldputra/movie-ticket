@@ -26,12 +26,14 @@ export default function BookingForm() {
   return (
     <Cell cols="8_full" className="">
       <GeneralForm title="Booking now" submitLabel="Book">
-        <label className="font-bold">Teater</label>
-        <DropdownInput items={teaters} />
         <label className="font-bold">Date</label>
         <Modal title="Select a Date">
           <DayPicker mode="single" />
         </Modal>
+        <label className="font-bold">City</label>
+        <DropdownInput items={teaters} />
+        <label className="font-bold">Teater</label>
+        <DropdownInput items={teaters} />
         <label className="font-bold">Time</label>
         <DropdownInput items={times} />
         <label className="font-bold">Seat</label>

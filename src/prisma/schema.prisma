@@ -55,13 +55,15 @@ model Schedule {
 }
 
 model Ticket {
-  id         Int      @id @default(autoincrement())
+  id         String      @id @default(cuid())
   scheduleId Int
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
   paymentId  String
-  Payment    Payment  @relation(fields: [paymentId], references: [id])
+  date       DateTime @db.Date
+  seat       Int
+  user       User     @relation(fields: [userId], references: [id])
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  sayment    Payment  @relation(fields: [paymentId], references: [id])
 }
 
 model Payment {

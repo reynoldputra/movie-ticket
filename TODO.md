@@ -47,13 +47,13 @@
 - [x] GET movie detail by slug
 
 ### Ticket
-- [ ] GET theater available
-- [ ] GET ticket available (seats, time and date)
+- [x] GET theater available
+- [x] GET ticket available (seats, time and date)
 - [ ] POST booking ticket
-- [ ] GET user tickets
+- [x] GET user tickets
 
 ### Balance
-- [ ] GET user balance info 
+- [x] GET user balance info 
 - [ ] POST top up
 - [ ] POST withdraw
 

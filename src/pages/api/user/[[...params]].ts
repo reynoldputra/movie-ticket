@@ -10,8 +10,10 @@ import {
   ValidationPipe,
   Catch,
   InternalServerErrorException,
+  Get,
 } from "next-api-decorators";
 import { Prisma } from "@prisma/client";
+import { checkSession } from "@/lib/server/checkSesion";
 
 @Catch(validationExceptionHandler)
 class Auth {
@@ -33,6 +35,7 @@ class Auth {
       });
 
       return {
+        status: true,
         message: "Success creating new user",
       };
     } catch (err) {
@@ -45,6 +48,30 @@ class Auth {
         }
       }
       console.log(err);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Get("/balance")
+  async getBalanceInfo(): Promise<ResponseDTO> {
+    try {
+      const session = await checkSession();
+      const userId = session.user.id;
+      const res = await prisma.user.findFirst({
+        where: {
+          id: userId,
+        },
+        select: {
+          balance: true,
+        },
+      });
+
+      return {
+        status: true,
+        message: "Success get user balance info",
+        data: res,
+      };
+    } catch (err) {
       throw new InternalServerErrorException();
     }
   }

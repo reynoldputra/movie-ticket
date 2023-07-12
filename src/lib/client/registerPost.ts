@@ -7,7 +7,7 @@ export const registerPost = async (value: RegisterInput) => {
   const id = toast.loading("Sending data ...")
   try {
     console.log(value)
-    await nextApi().post("/api/myauth/register", value)  
+    await nextApi().post("/api/user/register", value)  
     toast.update(id, {
       render : "Success creating new user",
       type : "success",
