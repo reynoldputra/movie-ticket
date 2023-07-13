@@ -14,6 +14,7 @@ import {
 import prisma from "@/lib/prisma";
 import { checkSession } from "@/lib/server/checkSesion";
 import { TransactionDTO } from "@/apiDecorators/dto/pay/transactionDto";
+import { OrderDTO } from "@/apiDecorators/dto/pay/orderDto";
 
 @Catch(validationExceptionHandler)
 class Pay {
@@ -151,7 +152,7 @@ class Pay {
 
       return {
         status: true,
-        message: "Success get history transaction",
+        message: "Success topup balance",
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
@@ -170,7 +171,8 @@ class Pay {
       });
       const currentBalanceInt = currentBalance?.balance ? currentBalance?.balance : 0;
 
-      if(currentBalanceInt < transactionDto.amount) throw new BadRequestException("Current ballance is less than withdraw amount")
+      if (currentBalanceInt < transactionDto.amount)
+        throw new BadRequestException("Current ballance is less than withdraw amount");
 
       await prisma.$transaction([
         prisma.user.update({
@@ -193,7 +195,113 @@ class Pay {
 
       return {
         status: true,
-        message: "Success get history transaction",
+        message: "Success withdraw balance",
+      };
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw new UnauthorizedException();
+      if (err instanceof BadRequestException) throw new BadRequestException(err.message);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Post("/payorder")
+  async payOrder(@Body(ValidationPipe) orderDto: OrderDTO): Promise<ResponseDTO> {
+    try {
+      const session = await checkSession();
+      const userId = session.user.id;
+
+      const paymentData = await prisma.payment.findUnique({
+        where: {
+          userId,
+          id: orderDto.paymentId,
+          status: "WAITING",
+        },
+      });
+
+      if (!paymentData) throw new BadRequestException("Order not found");
+
+      if (paymentData.due_date.getTime() > Date.now()) {
+        await prisma.payment.update({
+          where: {
+            id: paymentData.id,
+          },
+          data: {
+            status: "FAILED",
+          },
+        });
+        throw new BadRequestException("Payment is expired");
+      }
+
+      await prisma.$transaction([
+        prisma.transaction.create({
+          data: {
+            amount: paymentData.amount,
+            method: orderDto.paymentMethod,
+            type: "BUYTICKET",
+            userId,
+          },
+        }),
+        prisma.payment.update({
+          where: {
+            userId,
+            id: orderDto.paymentId,
+          },
+          data: {
+            status: "COMPLETE",
+          },
+        }),
+      ]);
+
+      return {
+        status: true,
+        message: "Success pay ticket order",
+      };
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw new UnauthorizedException();
+      if (err instanceof BadRequestException) throw new BadRequestException(err.message);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Post("/cancelorder")
+  async cancelOrder(@Body(ValidationPipe) orderDto: OrderDTO): Promise<ResponseDTO> {
+    try {
+      const session = await checkSession();
+      const userId = session.user.id;
+
+      const paymentData = await prisma.payment.findUnique({
+        where: {
+          userId,
+          id: orderDto.paymentId,
+          status: "WAITING",
+        },
+      });
+
+      if (!paymentData) throw new BadRequestException("Order not found");
+
+      await prisma.$transaction([
+        prisma.transaction.create({
+          data: {
+            amount: 0,
+            method: orderDto.paymentMethod,
+            type: "BUYTICKET",
+            userId,
+          },
+        }),
+        prisma.payment.update({
+          where: {
+            userId,
+            id: orderDto.paymentId,
+          },
+          data: {
+            status: "CANCEL",
+          },
+        }),
+      ]);
+
+      return {
+        status: true,
+        message: "Success cancel order",
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();

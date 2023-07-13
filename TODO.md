@@ -49,7 +49,7 @@
 ### Ticket
 - [x] GET theater available
 - [x] GET ticket available (seats, time and date)
-- [ ] POST booking ticket
+- [x] POST booking ticket
 - [x] GET user tickets
 
 ### Balance
@@ -59,5 +59,5 @@
 
 ### Payment
 - [x] GET payment history
-- [ ] POST pay transaction
-- [ ] POST cancel transaction
+- [x] POST pay transaction
+- [x] POST cancel transaction

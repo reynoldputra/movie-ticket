@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["extendedWhereUnique"]
 }
 
 datasource db {
@@ -72,6 +73,7 @@ model Payment {
   due_date      DateTime
   userId        String
   status        PaymentStatus
+  amount        Int
   transactionId Int?          @unique
   transaction   Transaction?  @relation(fields: [transactionId], references: [id])
 }
@@ -137,5 +139,6 @@ enum TransactionType {
 enum PaymentStatus {
   WAITING  @map("Waiting")
   FAILED   @map("Failed")
+  CANCEL   @map("Canceled")
   COMPLETE @map("Complete")
 }
