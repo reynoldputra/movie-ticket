@@ -18,7 +18,11 @@ import { checkSession } from "@/lib/server/checkSesion";
 @Catch(validationExceptionHandler)
 class Auth {
   @Post("/register")
-  async createUser(@Body(ValidationPipe()) body: CreateUserDTO): Promise<ResponseDTO> {
+  async createUser(@Body(ValidationPipe({
+    validationError: {
+      target : true
+    }
+  })) body: CreateUserDTO): Promise<ResponseDTO> {
     let salt = bcrypt.genSaltSync(10);
     body.password = bcrypt.hashSync(body.password, salt);
 

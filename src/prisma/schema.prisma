@@ -72,15 +72,15 @@ model Payment {
   due_date      DateTime
   userId        String
   status        PaymentStatus
-  method        PaymentMethod
   transactionId Int?          @unique
   transaction   Transaction?  @relation(fields: [transactionId], references: [id])
 }
 
 model Transaction {
   id      Int             @id @default(autoincrement())
-  date    DateTime
+  date    DateTime        @default(now())
   userId  String
+  method  PaymentMethod
   user    User            @relation(fields: [userId], references: [id])
   amount  Int
   type    TransactionType

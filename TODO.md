@@ -54,8 +54,8 @@
 
 ### Balance
 - [x] GET user balance info 
-- [ ] POST top up
-- [ ] POST withdraw
+- [x] POST top up
+- [x] POST withdraw
 
 ### Payment
 - [x] GET payment history

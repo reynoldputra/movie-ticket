@@ -4,19 +4,21 @@ import {
   createHandler,
   Catch,
   Get,
-  Query,
-  NotFoundException,
   InternalServerErrorException,
   UnauthorizedException,
+  Post,
+  Body,
+  ValidationPipe,
+  BadRequestException,
 } from "next-api-decorators";
 import prisma from "@/lib/prisma";
-import { Prisma, Schedule as ScheduleType } from "@prisma/client";
 import { checkSession } from "@/lib/server/checkSesion";
+import { TransactionDTO } from "@/apiDecorators/dto/pay/transactionDto";
 
 @Catch(validationExceptionHandler)
 class Pay {
   @Get("/active")
-  async getWaitingPayment() {
+  async getWaitingPayment(): Promise<ResponseDTO> {
     try {
       const session = await checkSession();
       const userId = session.user.id;
@@ -63,21 +65,21 @@ class Pay {
   }
 
   @Get("/history")
-  async getHistoryTransaction() {
+  async getHistoryTransaction(): Promise<ResponseDTO> {
     try {
       const session = await checkSession();
       const userId = session.user.id;
       const res = await prisma.transaction.findMany({
         where: {
           userId,
-          Payment: {
+          payment: {
             isNot: {
               status: "WAITING",
             },
           },
         },
         select: {
-          Payment: {
+          payment: {
             select: {
               tickets: {
                 select: {
@@ -113,6 +115,89 @@ class Pay {
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Post("/topup")
+  async topup(@Body(ValidationPipe) transactionDto: TransactionDTO): Promise<ResponseDTO> {
+    try {
+      const session = await checkSession();
+      const userId = session.user.id;
+      const currentBalance = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { balance: true },
+      });
+      const currentBalanceInt = currentBalance?.balance ? currentBalance?.balance : 0;
+
+      await prisma.$transaction([
+        prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            balance: currentBalanceInt + transactionDto.amount,
+          },
+        }),
+        prisma.transaction.create({
+          data: {
+            amount: transactionDto.amount,
+            method: transactionDto.paymentMethod,
+            type: "TOPUP",
+            userId,
+          },
+        }),
+      ]);
+
+      return {
+        status: true,
+        message: "Success get history transaction",
+      };
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw new UnauthorizedException();
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Post("/withdraw")
+  async withdraw(@Body(ValidationPipe) transactionDto: TransactionDTO): Promise<ResponseDTO> {
+    try {
+      const session = await checkSession();
+      const userId = session.user.id;
+      const currentBalance = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { balance: true },
+      });
+      const currentBalanceInt = currentBalance?.balance ? currentBalance?.balance : 0;
+
+      if(currentBalanceInt < transactionDto.amount) throw new BadRequestException("Current ballance is less than withdraw amount")
+
+      await prisma.$transaction([
+        prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            balance: currentBalanceInt - transactionDto.amount,
+          },
+        }),
+        prisma.transaction.create({
+          data: {
+            amount: -transactionDto.amount,
+            method: transactionDto.paymentMethod,
+            type: "WITHDRAW",
+            userId,
+          },
+        }),
+      ]);
+
+      return {
+        status: true,
+        message: "Success get history transaction",
+      };
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw new UnauthorizedException();
+      if (err instanceof BadRequestException) throw new BadRequestException(err.message);
       throw new InternalServerErrorException();
     }
   }
