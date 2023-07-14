@@ -17,7 +17,9 @@ export default function GeneralForm({ children, title, submitLabel, className }:
       <div className="text-black font-bold text-xl text-center">{title}</div>
       <div className="pb-12">
         {children}
-        <div className="bg-blue-600 text-white text-center font-bold py-1 mt-4">{submitLabel}</div>
+        <button type="submit" className="w-full">
+          <div className="bg-blue-600 text-white text-center font-bold py-1 mt-4">{submitLabel}</div>
+        </button>
       </div>
     </div>
   );

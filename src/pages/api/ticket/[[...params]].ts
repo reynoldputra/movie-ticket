@@ -10,11 +10,15 @@ import {
   Body,
   ValidationPipe,
   BadRequestException,
+  Req,
+  Res,
 } from "next-api-decorators";
 import prisma from "@/lib/prisma";
 import { checkSession } from "@/lib/server/checkSesion";
 import { TicketOrderDTO } from "@/apiDecorators/dto/ticket/ticketOrderDto";
 import { Prisma, Ticket as TicketType } from "@prisma/client";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { formaterDate } from "@/lib/server/formatDate";
 
 @Catch(validationExceptionHandler)
 class Ticket {
@@ -91,25 +95,34 @@ class Ticket {
   }
 
   @Post("/order")
-  async orderTicket(@Body(ValidationPipe) ticketOrderDto: TicketOrderDTO) {
+  async orderTicket(
+    @Body(ValidationPipe) ticketOrderDto: TicketOrderDTO,
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
+  ) {
     try {
-      const session = await checkSession();
+      const session = await checkSession(req, res);
       const userId = session.user.id;
       const currentDateTime = new Date();
+      const checkDate = Date.parse(ticketOrderDto.date);
+      if (isNaN(checkDate)) throw new BadRequestException("Date is not valid");
+
+      const date = formaterDate(ticketOrderDto.date);
 
       const bookedTickets = await prisma.ticket.findMany({
-        where : {
-          scheduleId : ticketOrderDto.scheduleId,
-          date : ticketOrderDto.date
+        where: {
+          scheduleId: ticketOrderDto.scheduleId,
+          date,
         },
-        select : {
-          seat : true
-        }
-      })
+        select: {
+          seat: true,
+        },
+      });
 
-      const bookedSeats = bookedTickets.map((t) => t.seat) 
+      const bookedSeats = bookedTickets.map((t) => t.seat);
 
-      if(bookedSeats.some(seat => ticketOrderDto.seats.includes(seat))) throw new BadRequestException("Some of seats is booked")
+      if (bookedSeats.some((seat) => ticketOrderDto.seats.includes(seat)))
+        throw new BadRequestException("Some of seats is booked");
 
       const movie = await prisma.movie.findFirstOrThrow({
         where: {
@@ -120,6 +133,15 @@ class Ticket {
           },
         },
       });
+
+      const userInfo = await prisma.user.findFirstOrThrow({
+        where : {
+          id : userId
+        }
+      })
+
+      if(movie.age_rating > userInfo?.age) throw new BadRequestException("Age restricted")
+      if(movie.price * ticketOrderDto.seats.length > userInfo?.balance) throw new BadRequestException("Low balance")
 
       await prisma.$transaction(async () => {
         const payment = await prisma.payment.create({
@@ -132,19 +154,21 @@ class Ticket {
         });
 
         const tickets: Prisma.TicketCreateManyInput[] = [];
+        console.log(ticketOrderDto);
         for (let idx in ticketOrderDto.seats) {
           tickets.push({
-            date: ticketOrderDto.date,
+            date: date,
             scheduleId: ticketOrderDto.scheduleId,
             paymentId: payment.id,
             seat: ticketOrderDto.seats[idx],
-            userId
+            userId,
           });
         }
 
         await prisma.ticket.createMany({
-          data: tickets
-        })
+          data: tickets,
+        });
+
       });
 
       return {
@@ -152,10 +176,13 @@ class Ticket {
         message: "Success order tickets",
       };
     } catch (err) {
+      console.log(err);
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
+      if (err instanceof BadRequestException) throw new BadRequestException(err.message);
       throw new InternalServerErrorException();
     }
   }
+
 }
 
 export default createHandler(Ticket);

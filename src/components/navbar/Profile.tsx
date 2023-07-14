@@ -1,20 +1,33 @@
+import nextApi from '@/lib/client/api'
 import { Popover, Transition } from '@headlessui/react'
-import { signOut } from 'next-auth/react'
+import { getSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { BiLogOut } from 'react-icons/bi'
 import { CgProfile } from 'react-icons/cg'
 import { MdPayments } from 'react-icons/md'
 
-export default function ProfileNavbar({username, id} : {username : string, id : string}) {
+export default function ProfileNavbar({username = "empty", id} : {username : string, id : string}) {
+  const [balance, setBalance] = useState<number>(0)
+  const getBalance = async() => {
+    const res = await nextApi().get("/api/user/balance")
+    console.log(res.data)
+    if(res.data.status) setBalance(res.data.data.balance)
+  }
+
+  useEffect(() => {
+    getBalance()
+  }, [])
+
   return (
-      <Popover className="relative">
+      <Popover className="relative" >
         {({ open }) => (
           <>
             <Popover.Button
               className={`
                 ${open ? '' : 'text-opacity-90'}
                 h-full flex items-center justify-center text-white gap-6`}
+              onClick={() => getBalance()}
             >
               <p className="font-bold">{username}</p>
               <div className="h-8 w-8 bg-white rounded-md flex justify-center items-center">
@@ -40,7 +53,7 @@ export default function ProfileNavbar({username, id} : {username : string, id : 
                         My balance
                       </span>
                       <span className="text-sm font-medium text-gray-900">
-                        IDR 0
+                        IDR {balance}
                       </span>
                     </div>
                   </div>

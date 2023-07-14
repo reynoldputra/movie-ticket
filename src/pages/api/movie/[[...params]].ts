@@ -28,9 +28,28 @@ class Movie {
     }
   }
 
+  @Get("/slug")
+  async getSlugs(): Promise<ResponseDTO> {
+    try {
+      const res = await prisma.movie.findMany({
+        select : {
+          slug : true
+        }
+      });
+      const slugs = res.map((m) => m.slug )
+      return {
+        status: true,
+        message: "Success get all movies",
+        data: slugs
+      };
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException();
+    }
+  }
+
   @Get("/:id")
   async getMovie(@Param("id", ParseNumberPipe) id: number): Promise<ResponseDTO> {
-    console.log(id)
     try {
       const res = await prisma.movie.findUnique({
         where: {

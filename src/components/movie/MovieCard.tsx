@@ -1,9 +1,9 @@
 import { FunctionComponent } from "react";
 import Image from "next/image";
-import { Movie } from "@/interfaces/Movie";
+import { TMovie } from "@/interfaces/Movie";
 
 interface MovieCardProps {
-  movie: Movie;
+  movie: TMovie;
 }
 
 const MovieCard: FunctionComponent<MovieCardProps> = ({ movie }) => {
@@ -18,7 +18,7 @@ const MovieCard: FunctionComponent<MovieCardProps> = ({ movie }) => {
           <p className="font-bold text-cyan-300">{movie.age_rating}+</p>
         </div>
         <div className="w-full flex gap-2 text-slate-400 text-xs mt-3">
-          <p>{movie.release_date.getFullYear()}</p>
+          <p>{new Date(movie.release_date).getFullYear()}</p>
           <p>|</p>
           <p>Rp {movie.price.toString()}</p>
         </div>

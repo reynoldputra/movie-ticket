@@ -13,6 +13,7 @@ interface NavbarItemType {
 
 export default function Navbar() {
   const { data: session } = useSession();
+  console.log(session)
   const navbarItems: NavbarItemType[] = [
     {
       tag: "Home",
@@ -52,7 +53,7 @@ export default function Navbar() {
         <Cell cols="9_full">
           <div className="w-64 flex justify-end">
             {session ? (
-              <ProfileNavbar username={session?.user.name as string} id={session?.user.id} />
+              <ProfileNavbar username={session?.user.name ? session?.user.name : "" } id={session?.user.id} />
             ) : (
               <>
                 <Link href="/login">

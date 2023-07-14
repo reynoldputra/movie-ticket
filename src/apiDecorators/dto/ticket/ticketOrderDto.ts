@@ -1,4 +1,4 @@
-import { Min, Max, IsDate, IsNumber } from "class-validator";
+import { Min, Max, IsDate, IsNumber, IsString } from "class-validator";
 
 export class TicketOrderDTO {
   @IsNumber()
@@ -9,6 +9,6 @@ export class TicketOrderDTO {
   @Max(64, { each: true })
   seats!: number[];
 
-  @IsDate()
-  date!: Date;
+  @IsString()
+  date!: string;
 }

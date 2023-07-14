@@ -7,38 +7,182 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import SeatPicker from "./SeatPicker";
 import GeneralForm from "@/components/form/GeneralForm";
-export default function BookingForm() {
-  const teaters: Item[] = [
-    { id: 1, tag: "Pakuwon City Mall" },
-    { id: 2, tag: "Pakuwon Trade Center" },
-    { id: 3, tag: "City of Tomorrow" },
-    { id: 4, tag: "Tujungan Plaza" },
-    { id: 5, tag: "Galaxy Mall" },
-  ];
+import { TicketOrderInput } from "@/interfaces/FormInput";
+import { FormProvider, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import DropdownWithCtx from "@/components/form/DropdownWithCtx";
+import nextApi from "@/lib/client/api";
+import clsxm from "@/lib/clsxm";
+import { orderTicketPost } from "@/lib/client/orderTicketPost";
 
-  const times: Item[] = [
-    { id: 1, tag: "08:00" },
-    { id: 2, tag: "10:00" },
-    { id: 3, tag: "12:00" },
-    { id: 4, tag: "14:00" },
-  ];
+interface Time {
+  time: Date;
+  scheduleId: string;
+}
+
+interface ScheduleItem {
+  name: string;
+  address: string;
+  times: Time[];
+}
+
+export default function BookingForm({ movieId }: { movieId: number }) {
+  const [schedule, setSchedule] = useState<ScheduleItem[] | null>(null);
+  const [cities, setCities] = useState<Item[] | null>(null);
+  const [seats, setSeats] = useState<number[]>([]);
+  const [selectSched, setSelectSched] = useState<number | null>(null);
+  const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+  const [date, setDate] = useState<Date>(new Date());
+  const [city, setCity] = useState<Item | null>(null);
+  const [range, setRange] = useState<{ start: Date; end: Date } | null>(null);
+  const formMethod = useForm<TicketOrderInput>();
+
+  const onClickSeatHandle = (seat: number) => {
+    if (selectedSeats.includes(seat)) {
+      let newSeats = selectedSeats.filter((seatState) => seatState != seat);
+      setSelectedSeats(newSeats);
+      formMethod.setValue("seats", newSeats);
+    } else {
+      if(selectedSeats.length < 6) {
+        let newSeats = [...selectedSeats];
+        newSeats.push(seat);
+        setSelectedSeats(newSeats);
+        formMethod.setValue("seats", newSeats);
+      }
+    }
+  };
+
+  const getCities = async () => {
+    const result = await nextApi().get("/api/teater/city");
+    const citiesData = result.data.data.map((c: string) => ({ value: c, tag: c }));
+    setCity(citiesData[0])
+    setCities(citiesData);
+  };
+
+  const getSchedules = async (city: string) => {
+    const result = await nextApi().get("/api/schedule", {
+      params: {
+        movieId: movieId.toString(),
+        city: city,
+        date: new Date().toString(),
+      },
+    });
+    const theaters: unknown[] = result.data.data;
+    const newSched: ScheduleItem[] = theaters.map((t: any) => {
+      return {
+        name: t.teater.name,
+        address: t.teater.address,
+        times: t.schedules.map((s: any) => {
+          return {
+            time: new Date(s.time),
+            scheduleId: s.id,
+          };
+        }),
+      };
+    });
+    console.log(newSched);
+    newSched.map((s) => {
+      s.times.sort((a, b) => b.time.getTime() - a.time.getTime());
+    });
+    setSchedule(newSched);
+  };
+
+
+  const getSeatsData = async (date : string, scheduleId : number) => {
+    const result = await nextApi().get(`/api/seat/${scheduleId}`, {
+      params : {
+        date
+      }
+    })
+    console.log(result.data)
+    setSeats(result.data.data)
+    console.log(seats)
+  }
+
+  const scheduleClick = (schedId: number) => {
+    setSelectSched(schedId);
+    formMethod.setValue("scheduleId", schedId);
+    getSeatsData(date.toLocaleDateString(), schedId)
+  };
+
+  useEffect(() => {
+    if(city) getSchedules(city.value.toString());
+  }, [city]);
+
+  useEffect(() => {
+    getCities();
+    formMethod.setValue('date', new Date().toLocaleDateString())
+  }, [])
+
+  const onSubmit = formMethod.handleSubmit(async (data) => {
+    console.log(data);
+    await orderTicketPost(data)
+  });
 
   return (
-    <Cell cols="8_full" className="">
-      <GeneralForm title="Booking now" submitLabel="Book">
-        <label className="font-bold">Date</label>
-        <Modal title="Select a Date">
-          <DayPicker mode="single" />
-        </Modal>
-        <label className="font-bold">City</label>
-        <DropdownInput items={teaters} />
-        <label className="font-bold">Teater</label>
-        <DropdownInput items={teaters} />
-        <label className="font-bold">Time</label>
-        <DropdownInput items={times} />
-        <label className="font-bold">Seat</label>
-        <SeatPicker />
-      </GeneralForm>
+    <Cell cols="1_full" className="flex justify-center py-32">
+      <FormProvider {...formMethod}>
+        <form onSubmit={onSubmit}>
+          <GeneralForm className="w-[800px] h-[600px]" title="Booking now" submitLabel="Book">
+            {cities && 
+              <>
+                <label className="font-bold">Date</label>
+                <DropdownInput items={cities} selected={city} setSelected={setCity} />
+              </>
+            }
+            <label className="font-bold">Date</label>
+            <Modal title={date ? date.toDateString() : "Select a Date"}>
+              <DayPicker
+                mode="single"
+                selected={date}
+                // fromDate={range?.start}
+                // toDate={range?.end}
+                onSelect={(v) => {
+                  if (v) {
+                    setDate(v);
+                    formMethod.setValue("date", v.toLocaleDateString());
+                    if(city)
+                      getSchedules(city?.value.toString());
+                  }
+                }}
+              />
+            </Modal>
+            {schedule && (
+              <div className="mt-2 h-48 overflow-y-scroll flex flex-col gap-y-2">
+                {schedule.map((s) => (
+                  <>
+                    <div className="py-2 border border-2 px-2">
+                      <p className="font-bold text-sm">{s.name}</p>
+                      <p className="text-xs text-slate-600">{s.address}</p>
+                      <div className="text-sm w-72 flex gap-x-2 py-1">
+                        {s.times.map((t) => (
+                          <p
+                            className={clsxm([
+                              "border border-2 border-slate-200 bg-none rounded px-2 py-1 cursor-pointer",
+                              selectSched == parseInt(t.scheduleId) ? "bg-blue-600 border-blue-600 text-white" : "",
+                            ])}
+                            key={t.scheduleId}
+                            onClick={() => scheduleClick(parseInt(t.scheduleId))}
+                          >
+                            {new Date(t.time).getHours()}:{new Date(t.time).getMinutes()}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                ))}
+              </div>
+            )}
+            {selectSched && (
+              <>
+                <label className="font-bold">Seat</label>
+                <SeatPicker onClickSeatHandle={onClickSeatHandle} seats={selectedSeats} booked={seats} />
+              </>
+            )}
+          </GeneralForm>
+        </form>
+      </FormProvider>
     </Cell>
   );
+
 }

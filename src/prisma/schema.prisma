@@ -32,8 +32,8 @@ model Movie {
   slug         String     @unique
   release_date DateTime
   poster_url   String
-  age_rating   Int
   price        Int
+  age_rating   Int
   description  String     @db.Text
   schedules    Schedule[]
 }
@@ -42,17 +42,20 @@ model Teater {
   id        Int        @id @default(autoincrement())
   name      String
   city      String
+  address   String
   schedules Schedule[]
 }
 
 model Schedule {
-  id       Int      @id @default(autoincrement())
-  teaterId Int
-  time     DateTime @db.Time()
-  movieId  Int
-  teater   Teater   @relation(fields: [teaterId], references: [id])
-  movie    Movie    @relation(fields: [movieId], references: [id])
-  tickets  Ticket[]
+  id         Int      @id @default(autoincrement())
+  teaterId   Int
+  time       DateTime @db.Time()
+  movieId    Int
+  end_date   DateTime @db.Date
+  start_date DateTime @db.Date
+  teater     Teater   @relation(fields: [teaterId], references: [id])
+  movie      Movie    @relation(fields: [movieId], references: [id])
+  tickets    Ticket[]
 }
 
 model Ticket {

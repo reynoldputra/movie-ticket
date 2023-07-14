@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { Item } from '@/interfaces/DropdownItems'
 import UpDownIcon from '@/pageComponents/booking/bookingForm/UpDownIcon'
@@ -6,17 +6,17 @@ import { BsCheckLg } from "react-icons/bs"
 
 interface DropdownProps {
   items: Item[]
+  selected : Item | null
+  setSelected  : Dispatch<SetStateAction<Item | null>>
 }
 
-export default function DropdownInput({ items }: DropdownProps) {
-  const [selected, setSelected] = useState<Item>(items[0])
-
+export default function DropdownInput({ items, selected, setSelected }: DropdownProps) {
   return (
     <div className="w-full min-w-[256px]">
       <Listbox value={selected} onChange={setSelected}>
         <div className="relative mt-1">
           <Listbox.Button className="relative w-full cursor-default rounded-lg bg-gray-200 py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-            <span className="block truncate text-black">{selected.tag}</span>
+            <span className="block truncate text-black">{selected ? selected.tag : "Select"}</span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
               <UpDownIcon />
             </span>

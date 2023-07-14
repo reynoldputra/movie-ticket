@@ -61,3 +61,18 @@
 - [x] GET payment history
 - [x] POST pay transaction
 - [x] POST cancel transaction
+
+
+
+
+
+## API Integration
+- [x] Movies page (get static props)
+- [x] Movie detail page (get static path)
+- [x] Book ticket
+- [x] Topup
+- [ ] Withdraw
+- [x] Login
+- [x] Register
+- [ ] Tickets
+- [ ] Transactions

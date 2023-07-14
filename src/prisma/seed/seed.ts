@@ -1,4 +1,4 @@
-import { Movie, PrismaClient, Schedule, Teater } from "@prisma/client";
+import { Movie, Prisma, PrismaClient, Schedule, Teater } from "@prisma/client";
 import movieData from "./data/movies.json" assert { type: "json" };
 import teaterData from "./data/teater.json" assert { type: "json" };
 import slugify from "slugify";
@@ -6,13 +6,13 @@ import { randomPicker, pickUniqueNumbers } from "../../lib/helper";
 const prisma = new PrismaClient();
 
 async function main() {
+  console.log("Seeding movies ... ")
   for (let idx in movieData) {
     const movie = movieData[idx];
     const date = new Date(movie.release_date);
     const parsedTitle = movie.title.replace(/[^a-zA-Z\s]/g, "").toLowerCase();
     const slug = slugify(parsedTitle, "-");
-    const newMovie: Movie = {
-      id: parseInt(idx),
+    const newMovie: Prisma.MovieCreateInput = {
       title: movie.title,
       slug: slug,
       release_date: date,
@@ -28,12 +28,14 @@ async function main() {
     });
   }
 
+  console.log("Seeding theaters ... ")
   for (let idx in teaterData) {
     const teater = teaterData[idx];
     const newTeater: Teater = {
       id: teater.id,
       name: teater.name,
       city: teater.city,
+      address: teater.address,
     };
     await prisma.teater.upsert({
       where: { id: teater.id },
@@ -43,9 +45,13 @@ async function main() {
   }
 
   let id = 1;
-  for (let i in movieData) {
+  console.log("Seeding schedules ... ")
+  const movie = await prisma.movie.findMany()
+  for (let i in movie) {
     const minutes = [15, 20, 30, 45, 55];
     for (let j in teaterData) {
+      const currentDate = new Date();
+      const end_day = randomPicker(-5, 20);
       const hours = pickUniqueNumbers(11, 22, 6);
       for (let h in hours) {
         let hour = hours[h];
@@ -56,8 +62,10 @@ async function main() {
         let time = dateObj;
         const newSchedule: Schedule = {
           id,
+          movieId: movie[i].id,
           teaterId: teaterData[j].id,
-          movieId: movieData[i].id,
+          start_date: new Date(currentDate.getTime() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+          end_date: new Date(currentDate.getTime() + (end_day * 24 * 60 * 60 * 1000)), // dyanmic
           time,
         };
         await prisma.schedule.upsert({

@@ -1,8 +1,12 @@
-import { UnauthorizedException } from "next-api-decorators"
-import { getServerSession } from "next-auth"
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { Session } from "inspector";
+import { NextApiRequest, NextApiResponse } from "next";
+import { UnauthorizedException } from "next-api-decorators";
+import { getServerSession } from "next-auth";
 
-export const checkSession = async () => {
-  const session = await getServerSession()
-  if(!session) throw new UnauthorizedException
+export const checkSession = async (req: NextApiRequest, res: NextApiResponse) => {
+  const session = await getServerSession(req, res, authOptions);
+  console.log(session)
+  if (!session) throw new UnauthorizedException();
   return session
-}
+};

@@ -7,26 +7,35 @@ import {
   InternalServerErrorException,
   Param,
   BadRequestException,
+  Query,
 } from "next-api-decorators";
 import prisma from "@/lib/prisma";
+import { formaterDate } from "@/lib/server/formatDate";
 
 @Catch(validationExceptionHandler)
 class Seat {
-  @Get("/:scheduleId/:date")
-  async getSeats(@Param("scheduleId") scheduleId: string, @Param("date") date: string) : Promise<ResponseDTO> {
+  @Get("/:scheduleId")
+  async getSeats(@Param("scheduleId") scheduleId: string, @Query("date") date: string) : Promise<ResponseDTO> {
     try {
       const checkDate = Date.parse(date);
       if (isNaN(checkDate)) throw new BadRequestException("Date is not valid");
       if (isNaN(parseInt(scheduleId))) throw new BadRequestException("ScheduleId is not valid");
-      const parsedDate = new Date(date);
+      const parsedDate = formaterDate(date);
+      parsedDate.setUTCHours(0)
+      console.log(scheduleId, parsedDate)
       const res = await prisma.ticket.findMany({
         where: {
-          AND: [{ scheduleId: parseInt(scheduleId) }, { date: parsedDate }],
+          date : {
+            equals : parsedDate
+          },
+          scheduleId : parseInt(scheduleId)
         },
         select: {
           seat : true
         },
       });
+
+      console.log(res)
 
       const seats = res.map(seat => seat.seat)
       return {

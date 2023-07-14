@@ -11,12 +11,16 @@ import {
   Catch,
   InternalServerErrorException,
   Get,
+  Req,
+  Res,
 } from "next-api-decorators";
 import { Prisma } from "@prisma/client";
 import { checkSession } from "@/lib/server/checkSesion";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { JwtAuthGuard } from "@/apiDecorators/decorator/auth";
 
-@Catch(validationExceptionHandler)
 class Auth {
+  @Catch(validationExceptionHandler)
   @Post("/register")
   async createUser(@Body(ValidationPipe({
     validationError: {
@@ -57,11 +61,15 @@ class Auth {
   }
 
   @Get("/balance")
-  async getBalanceInfo(): Promise<ResponseDTO> {
+  @JwtAuthGuard()
+  async getBalanceInfo(
+    @Req() req : NextApiRequest,
+    @Res() res : NextApiResponse
+  ): Promise<ResponseDTO> {
     try {
-      const session = await checkSession();
+      const session = await checkSession(req, res);
       const userId = session.user.id;
-      const res = await prisma.user.findFirst({
+      const result = await prisma.user.findFirst({
         where: {
           id: userId,
         },
@@ -73,7 +81,7 @@ class Auth {
       return {
         status: true,
         message: "Success get user balance info",
-        data: res,
+        data: result,
       };
     } catch (err) {
       throw new InternalServerErrorException();

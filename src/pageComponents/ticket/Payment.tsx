@@ -3,8 +3,23 @@ import Cell from "@/components/layout/cell";
 import Grid from "@/components/layout/grid";
 import { Ticket } from "@/interfaces/Ticket";
 import { TicketTrans } from "@/interfaces/Transaction";
+import nextApi from "@/lib/client/api";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 export default function Payment() {
+  const router = useRouter()
+  const paymentid = router.query.paymentid
+
+  const getPaymentDetail = async () => {
+    const result = await nextApi().get("/api/pay/" + paymentid).catch((err) => console.log(err))
+    console.log ("pay detail", result)
+  }
+
+  useEffect(()=> {
+    if(paymentid) getPaymentDetail()
+  },[])
+
   const ticket: Ticket = {
     uid: "asdas1231",
     time: "12.05",

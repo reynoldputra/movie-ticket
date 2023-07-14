@@ -1,9 +1,44 @@
 [
-  { "id" : 1, "name": "Pakuwon City Mall", "city" : "Surabaya" },
-  { "id" : 2,"name": "Pakuwon Trade Center", "city" : "Surabaya" },
-  { "id" : 3,"name": "City of Tomorrow", "city" : "Surabaya" },
-  { "id" : 4,"name": "Tujungan Plaza", "city" : "Surabaya" },
-  { "id" : 5,"name": "Galaxy Mall", "city" : "Surabaya" },
-  { "id" : 6,"name": "Malang Town Square", "city" : "Malang" },
-  { "id" : 7,"name": "Mall Olympic Garden", "city" : "Malang" }
+  {
+    "id": 1,
+    "name": "Pakuwon City Mall XXI",
+    "city": "Surabaya",
+    "address": "Jl. Raya Laguna KJW Putih Tambak No.2, Kejawaan Putih Tamba, Kec. Mulyorejo, Surabaya, Jawa Timur"
+  },
+  {
+    "id": 2,
+    "name": "Pakuwon Trade Center XXI",
+    "city": "Surabaya",
+    "address": "Jl. Raya Lontar No.2, Babatan, Kec. Wiyung, Surabaya, Jawa Timur"
+  },
+  {
+    "id": 3,
+    "name": "City of Tomorrow Cinepolis",
+    "city": "Surabaya",
+    "address": "Jl. Ahmad Yani No.288, Dukuh Menanggal, Kec. Gayungan, Surabaya, Jawa Timur"
+  },
+  {
+    "id": 4,
+    "name": "MargoCity XXI",
+    "city": "Depok",
+    "address": "Jl. Ahmad Yani No.288, Dukuh Menanggal, Kec. Gayungan, Surabaya, Jawa Timur"
+  },
+  {
+    "id": 5,
+    "name": "Depok Townsquare Cinepolis",
+    "city": "Depok",
+    "address": "Jl. Margonda Raya No 1, RT 002/RW 008 Kemiri Muka, Pondok Cina, Kecamatan Beji, Kota Depok, Jawa Barat"
+  },
+  {
+    "id": 6,
+    "name": "Malang Town Square Cinepolis",
+    "city": "Malang",
+    "address": "Jl. Veteran No.2, Penanggungan, Kec. Klojen, Kota Malang, Jawa Timur"
+  },
+  {
+    "id": 7,
+    "name": "Transmart Malang XXI",
+    "city": "Malang",
+    "address": "Jl. Veteran No.8, Penanggungan, Kec. Klojen, Kota Malang, Jawa Timur"
+  }
 ]

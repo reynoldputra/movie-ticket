@@ -10,20 +10,28 @@ import {
   Body,
   ValidationPipe,
   BadRequestException,
+  Res,
+  Req,
+  UseMiddleware,
+  Param,
 } from "next-api-decorators";
 import prisma from "@/lib/prisma";
 import { checkSession } from "@/lib/server/checkSesion";
 import { TransactionDTO } from "@/apiDecorators/dto/pay/transactionDto";
 import { OrderDTO } from "@/apiDecorators/dto/pay/orderDto";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 @Catch(validationExceptionHandler)
 class Pay {
   @Get("/active")
-  async getWaitingPayment(): Promise<ResponseDTO> {
+  async getWaitingPayment(
+    @Req() req : NextApiRequest,
+    @Res() res : NextApiResponse
+  ): Promise<ResponseDTO> {
     try {
-      const session = await checkSession();
+      const session = await checkSession(req, res);
       const userId = session.user.id;
-      const res = await prisma.payment.findMany({
+      const result = await prisma.payment.findMany({
         where: {
           userId,
           status: "WAITING",
@@ -45,6 +53,50 @@ class Pay {
               date: true,
             },
           },
+        },
+      });
+
+      return {
+        status: true,
+        message: "Success get waiting transactions",
+        data: result,
+      };
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw new UnauthorizedException();
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Get("/:paymentid")
+  async getPaymentDetails(
+    @Param('paymentid') paymentId : string,
+    @Req() req : NextApiRequest,
+    @Res() res : NextApiResponse
+  ): Promise<ResponseDTO> {
+    try {
+      const session = await checkSession(req, res);
+      const userId = session.user.id;
+      const result = await prisma.payment.findFirstOrThrow({
+        where: {
+          userId,
+          status: "WAITING",
+          id: paymentId
+        },
+        select: {
+          tickets: {
+            select: {
+              schedule: {
+                select: {
+                  movie: true,
+                  time: true,
+                  teater: {
+                    select: { name: true },
+                  },
+                },
+              },
+              date: true,
+            },
+          },
           transaction: {
             select: {
               amount: true,
@@ -56,10 +108,11 @@ class Pay {
 
       return {
         status: true,
-        message: "Success get waiting transactions",
-        data: res,
+        message: "Success get payment detail",
+        data: result,
       };
     } catch (err) {
+      console.log(err)
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
       throw new InternalServerErrorException();
     }
@@ -121,9 +174,14 @@ class Pay {
   }
 
   @Post("/topup")
-  async topup(@Body(ValidationPipe) transactionDto: TransactionDTO): Promise<ResponseDTO> {
+  @Catch(validationExceptionHandler)
+  async topup(
+    @Body(ValidationPipe) transactionDto: TransactionDTO,
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
+  ): Promise<ResponseDTO> {
     try {
-      const session = await checkSession();
+      const session = await checkSession(req, res);
       const userId = session.user.id;
       const currentBalance = await prisma.user.findUnique({
         where: { id: userId },
@@ -161,6 +219,7 @@ class Pay {
   }
 
   @Post("/withdraw")
+  @UseMiddleware()
   async withdraw(@Body(ValidationPipe) transactionDto: TransactionDTO): Promise<ResponseDTO> {
     try {
       const session = await checkSession();

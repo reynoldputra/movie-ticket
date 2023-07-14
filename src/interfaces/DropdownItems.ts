@@ -1,4 +1,4 @@
 export interface Item {
-  id: number
+  value: string | number
   tag: string
 }

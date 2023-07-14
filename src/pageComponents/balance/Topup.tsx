@@ -1,27 +1,59 @@
-import DropdownInput from "@/components/form/DropdownInput";
+import DropdownWithCtx from "@/components/form/DropdownWithCtx";
 import GeneralForm from "@/components/form/GeneralForm";
-import InputText from "@/components/form/InputText";
+import InputWithCtx from "@/components/form/InputWithCtx";
 import Cell from "@/components/layout/cell";
 import Grid from "@/components/layout/grid";
 import { Item } from "@/interfaces/DropdownItems";
+import { TopupInput } from "@/interfaces/FormInput";
+import { topupPost } from "@/lib/client/topupPost";
+import { PaymentMethod } from "@prisma/client";
+import { FormProvider, useForm } from "react-hook-form";
 
 export default function Topup() {
-  const PayMathods: Item[] = [
-    { id: 1, tag: "OVO" },
-    { id: 2, tag: "GOPAY" },
-    { id: 3, tag: "BRI" },
-    { id: 4, tag: "BCA" },
+  const PayMethods: Item[] = [
+    { value: PaymentMethod.BCA, tag: "BCA" },
+    { value: PaymentMethod.QRIS, tag: "QRIS" }
   ];
+
+  const formMethod = useForm<TopupInput>();
+
+  const onSubmit = formMethod.handleSubmit( async (data) => {
+    const error = await topupPost(data)
+    if(error) {
+      error.map((err : any) => {
+        console.log(err.message)
+        formMethod.setError(err.target, {
+          type : "validation",
+          message : err.message
+        })
+      })
+      console.log(formMethod.formState.errors)
+    } else {
+      formMethod.reset()
+    }
+  });
 
   return (
     <Grid className="pt-40">
       <Cell cols="1_full" className="flex justify-center">
-        <GeneralForm title="Top up" submitLabel="Pay" >
-          <p className="font-bold mt-2">Cash (IDR)</p>
-          <InputText name="cash" />
-          <p className="font-bold mt-2">Payment Method</p>
-          <DropdownInput items={PayMathods} />
-        </GeneralForm>
+        <FormProvider {...formMethod}>
+          <form onSubmit={onSubmit}>
+            <GeneralForm title="Top up" submitLabel="Pay">
+              <InputWithCtx
+                name="amount"
+                label="CASH (IDR)"
+                option={{
+                  required : true
+                }}
+              />
+              <DropdownWithCtx
+                items={PayMethods}
+                name="paymentMethod"
+                label="Payment Method"
+              />
+            </GeneralForm>
+          </form>
+        </FormProvider>
       </Cell>
     </Grid>
   );

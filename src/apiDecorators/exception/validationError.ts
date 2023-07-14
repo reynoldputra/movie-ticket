@@ -19,7 +19,14 @@ export default function validationExceptionHandler(
         message,
       });
     }
-    res.status(400).json({ status: false, message: "Input not valid", error: newError });
+    res.status(400).json({
+      status: false,
+      message: "Input not valid",
+      error: {
+        code: 1432,
+        data: newError,
+      },
+    });
   }
   const message = error instanceof Error ? error.message : "An unknown error occurred.";
   res.status(400).json({ status: false, message });

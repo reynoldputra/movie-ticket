@@ -7,33 +7,69 @@ import {
   Query,
   NotFoundException,
   InternalServerErrorException,
+  ValidationPipe,
+  Body,
+  BadRequestException,
 } from "next-api-decorators";
 import prisma from "@/lib/prisma";
-import { Prisma, Schedule as ScheduleType } from "@prisma/client";
+import { Prisma, Schedule as ScheduleType, Teater } from "@prisma/client";
+
+interface ScheduleInTheater {
+  teater : Teater,
+  schedules : unknown[]
+}
 
 @Catch(validationExceptionHandler)
 class Schedule {
   @Get()
   async getAllSchedule(
-    @Query("teaterId") teaterId?: string,
     @Query("movieId") movieId?: string,
+    @Query("city") city?: string,
+    @Query("date") date?: string
   ): Promise<ResponseDTO> {
     try {
-      let res: ScheduleType[];
-      let condition: Prisma.ScheduleFindManyArgs = {};
-      if (teaterId) condition.where = { ...condition.where, teaterId : parseInt(teaterId) };
-      if (movieId) {
-        condition.where = {
-          ...condition.where,
+      if (!movieId || !city || !date) throw new BadRequestException("Query params not valid");
+
+      console.log(movieId, city, date);
+      const schedules = await prisma.schedule.findMany({
+        where: {
+          teater: {
+            city,
+          },
           movieId: parseInt(movieId),
-        };
+          end_date: {
+            gte: new Date(date),
+          },
+          start_date: {
+            lte: new Date(date),
+          },
+        },
+      });
+
+      const theaters = await prisma.teater.findMany({
+        where : {
+          city
+        }
+      })
+
+      const filteredSchedule : ScheduleInTheater[] = [] 
+      for(let theaterIdx in theaters) {
+        let schedulePerTheater : unknown[] = []
+        for(let scheduleIdx in schedules) {
+          if(schedules[scheduleIdx].teaterId == theaters[theaterIdx].id) {
+            const sched : unknown = schedules[scheduleIdx]
+            schedulePerTheater.push(sched)
+          } 
+        }
+        filteredSchedule.push({teater : theaters[theaterIdx], schedules : schedulePerTheater})
       }
-      res = await prisma.schedule.findMany(condition);
-      if (!res) throw new NotFoundException();
+
+
+      if (!filteredSchedule) throw new NotFoundException();
       return {
         status: true,
         message: "Success get schedules",
-        data: res,
+        data: filteredSchedule,
       };
     } catch (err) {
       console.log(err);
