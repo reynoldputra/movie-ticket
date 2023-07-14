@@ -11,7 +11,6 @@ export default function ProfileNavbar({username = "empty", id} : {username : str
   const [balance, setBalance] = useState<number>(0)
   const getBalance = async() => {
     const res = await nextApi().get("/api/user/balance")
-    console.log(res.data)
     if(res.data.status) setBalance(res.data.data.balance)
   }
 

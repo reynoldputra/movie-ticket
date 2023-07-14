@@ -30,7 +30,6 @@ class Schedule {
     try {
       if (!movieId || !city || !date) throw new BadRequestException("Query params not valid");
 
-      console.log(movieId, city, date);
       const schedules = await prisma.schedule.findMany({
         where: {
           teater: {
@@ -61,10 +60,7 @@ class Schedule {
             let checkDateScedh = new Date(sched.time);
             const userDate = new Date(date);
             const currentDate = new Date();
-            console.log(userDate.toLocaleDateString(), currentDate.toLocaleDateString())
-            if (
-              currentDate.toLocaleDateString() == userDate.toLocaleDateString() 
-            ) {
+            if (currentDate.toLocaleDateString() == userDate.toLocaleDateString()) {
               if (checkDateScedh.getTime() > new Date().getTime()) schedulePerTheater.push(sched);
             } else {
               schedulePerTheater.push(sched);

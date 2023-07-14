@@ -63,7 +63,7 @@ export default function BookingForm({ movieId }: { movieId: number }) {
       params: {
         movieId: movieId.toString(),
         city: city,
-        date: formMethod.getValues('date'),
+        date: formMethod.getValues("date"),
       },
     });
     const theaters: unknown[] = result.data.data;
@@ -72,14 +72,13 @@ export default function BookingForm({ movieId }: { movieId: number }) {
         name: t.teater.name,
         address: t.teater.address,
         times: t.schedules.map((s: any) => {
-            return {
-              time: new Date(s.time),
-              scheduleId: s.id,
-            };
+          return {
+            time: new Date(s.time),
+            scheduleId: s.id,
+          };
         }),
       };
     });
-    console.log(newSched);
     newSched.map((s) => {
       s.times.sort((a, b) => b.time.getTime() - a.time.getTime());
     });
@@ -92,9 +91,7 @@ export default function BookingForm({ movieId }: { movieId: number }) {
         date,
       },
     });
-    console.log(result.data);
     setSeats(result.data.data);
-    console.log(seats);
   };
 
   const scheduleClick = (schedId: number) => {
@@ -112,16 +109,16 @@ export default function BookingForm({ movieId }: { movieId: number }) {
     formMethod.setValue("date", new Date().toLocaleDateString());
   }, []);
 
-  const router = useRouter()
+  const router = useRouter();
   const onSubmit = formMethod.handleSubmit(async (data) => {
     console.log(data)
-    if(!data.seats.length || !data.date || !data.scheduleId) {
-      toast.error("Input not valid")
-      return
+    if (!data.seats?.length || !data.date || !data.scheduleId) {
+      toast.error("Input not valid");
+      return;
     }
     const res = await orderTicketPost(data);
-    console.log(res)
-    if(res.status) router.push("/payment/" + res.data.id)
+    console.log(res.data)
+    if (res?.data?.id) router.push("/payment/" + res.data.id);
   });
 
   return (
@@ -129,65 +126,71 @@ export default function BookingForm({ movieId }: { movieId: number }) {
       <FormProvider {...formMethod}>
         <form onSubmit={onSubmit}>
           <GeneralForm className="" title="Booking now" submitLabel="Book">
-            {cities && (
+            {cities && schedule ? (
               <>
-                <label className="font-bold">City</label>
-                <DropdownInput items={cities} selected={city} setSelected={setCity} />
-              </>
-            )}
-            <label className="font-bold">Date</label>
-            <Modal title={date ? date.toDateString() : "Select a Date"}>
-              <DayPicker
-                mode="single"
-                selected={date}
-                fromDate={new Date()}
-                toDate={new Date(new Date().getTime() + (10*24*60*60*1000))}
-                onSelect={(v) => {
-                  if (v) {
-                    setDate(v);
-                    formMethod.setValue("date", v.toString());
-                    if (city) getSchedules(city?.value.toString());
-                  }
-                }}
-              />
-            </Modal>
-            {schedule && (
-              <div className="my-8 h-48 overflow-y-scroll flex flex-col gap-y-2">
-                {schedule.map((s) => (
+                {cities && (
                   <>
-                    <div className="py-2 border border-2 px-2">
-                      <p className="font-bold text-sm">{s.name}</p>
-                      <p className="text-xs text-slate-600">{s.address}</p>
-                      <div className="text-sm w-full flex flex-wrap gap-y-1 gap-x-2 py-1">
-                        {s.times.map((t) => (
-                          <p
-                            className={clsxm([
-                              "border border-2 border-slate-200 bg-none rounded px-2 py-1 cursor-pointer",
-                              selectSched == parseInt(t.scheduleId)
-                                ? "bg-blue-600 border-blue-600 text-white"
-                                : "",
-                            ])}
-                            key={t.scheduleId}
-                            onClick={() => scheduleClick(parseInt(t.scheduleId))}
-                          >
-                            {new Date(t.time).getHours()}:{new Date(t.time).getMinutes()}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
+                    <label className="font-bold">City</label>
+                    <DropdownInput items={cities} selected={city} setSelected={setCity} />
                   </>
-                ))}
-              </div>
-            )}
-            {selectSched && (
-              <>
-                <label className="font-bold">Seat</label>
-                <SeatPicker
-                  onClickSeatHandle={onClickSeatHandle}
-                  seats={selectedSeats}
-                  booked={seats}
-                />
+                )}
+                <label className="font-bold">Date</label>
+                <Modal title={date ? date.toDateString() : "Select a Date"}>
+                  <DayPicker
+                    mode="single"
+                    selected={date}
+                    fromDate={new Date()}
+                    toDate={new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000)}
+                    onSelect={(v) => {
+                      if (v) {
+                        setDate(v);
+                        formMethod.setValue("date", v.toString());
+                        if (city) getSchedules(city?.value.toString());
+                      }
+                    }}
+                  />
+                </Modal>
+                {schedule && (
+                  <div className="my-8 h-48 overflow-y-scroll flex flex-col gap-y-2">
+                    {schedule.map((s) => (
+                      <>
+                        <div className="py-2 border border-2 px-2">
+                          <p className="font-bold text-sm">{s.name}</p>
+                          <p className="text-xs text-slate-600">{s.address}</p>
+                          <div className="text-sm w-full flex flex-wrap gap-y-1 gap-x-2 py-1">
+                            {s.times.map((t) => (
+                              <p
+                                className={clsxm([
+                                  "border border-2 border-slate-200 bg-none rounded px-2 py-1 cursor-pointer",
+                                  selectSched == parseInt(t.scheduleId)
+                                    ? "bg-blue-600 border-blue-600 text-white"
+                                    : "",
+                                ])}
+                                key={t.scheduleId}
+                                onClick={() => scheduleClick(parseInt(t.scheduleId))}
+                              >
+                                {new Date(t.time).getHours()}:{new Date(t.time).getMinutes()}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    ))}
+                  </div>
+                )}
+                {selectSched && (
+                  <>
+                    <label className="font-bold">Seat</label>
+                    <SeatPicker
+                      onClickSeatHandle={onClickSeatHandle}
+                      seats={selectedSeats}
+                      booked={seats}
+                    />
+                  </>
+                )}
               </>
+            ) : (
+              <p>Fetching form data</p>
             )}
           </GeneralForm>
         </form>

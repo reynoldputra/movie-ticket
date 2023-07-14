@@ -16,7 +16,6 @@ export default function TicketTransCard({ transaction }: TicketTransCardProps) {
   const [detailTicket, setDetailTicket] = useState<Ticket | null>(null);
 
   const getMovie = async () => {
-    console.log(transaction.uid);
     const result = await nextApi().get("/api/ticket/p/" + transaction.uid);
     setDetailTicket(result.data.data);
     setShowDetail(true);

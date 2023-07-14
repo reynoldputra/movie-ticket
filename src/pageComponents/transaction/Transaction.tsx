@@ -18,7 +18,6 @@ export default function Transaction() {
     const active = await nextApi().get("/api/pay/active");
     setWaitingPayment(active.data.data);
     const history = await nextApi().get("/api/pay/history");
-    console.log(history);
     const parsedTicket: TransHistory[] = history.data.data.map((h: TransHistory): TransHistory => {
       let color: string = "text-blue-600";
       h.status = {

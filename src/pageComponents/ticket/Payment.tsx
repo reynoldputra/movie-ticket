@@ -1,12 +1,11 @@
 import DropdownWithCtx from "@/components/form/DropdownWithCtx";
 import GeneralForm from "@/components/form/GeneralForm";
-import InputWithCtx from "@/components/form/InputWithCtx";
 import Cell from "@/components/layout/cell";
 import Grid from "@/components/layout/grid";
 import { Item } from "@/interfaces/DropdownItems";
 import { Ticket } from "@/interfaces/Ticket";
-import { TicketTrans } from "@/interfaces/Transaction";
 import nextApi from "@/lib/client/api";
+import { cancelOrderPost } from "@/lib/client/cancleOrderPost";
 import { payOrderPost } from "@/lib/client/payOrderPost";
 import { PaymentMethod } from "@prisma/client";
 import { useRouter } from "next/router";
@@ -81,7 +80,6 @@ export default function Payment() {
   const formMethod = useForm<{ method: string }>();
 
   const onSubmit = formMethod.handleSubmit( async (data) => {
-    console.log(data);
     await payOrderPost({
       paymentMethod : data.method,
       paymentId : paymentid ? paymentid.toString() : ""
@@ -94,6 +92,13 @@ export default function Payment() {
     { value: "BCA", tag: PaymentMethod.BCA },
     { value: "QRIS", tag: PaymentMethod.QRIS },
   ];
+
+
+  const cancelOrderHandler = async () => {
+    const res= await cancelOrderPost(paymentid as string)
+    if(res?.status) router.push("/ticket")
+
+  }
 
   return (
     <Grid className="pt-40">
@@ -120,9 +125,7 @@ export default function Payment() {
                   </p>
                 )}
               </div>
-              <div className="bg-red-600">
-                Cancel order
-              </div>
+              <div className="cursor-pointer bg-red-600 text-white text-center font-bold py-1 mt-4" onClick={cancelOrderHandler}>Cancel order</div>
             </GeneralForm>
           </form>
         </FormProvider>

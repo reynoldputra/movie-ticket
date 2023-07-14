@@ -74,7 +74,7 @@ class Ticket {
         data: ticketData,
       };
     } catch (err) {
-      console.log(err)
+      console.log(err);
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
       throw new InternalServerErrorException();
     }
@@ -170,14 +170,10 @@ class Ticket {
         },
       });
 
-      console.log(result);
-
       const ticketGroup: TTicket[] = result.map((w): TTicket => {
         const ticket = w.tickets[0];
         const schedule = ticket.schedule;
         const teater = schedule.teater;
-        console.log("sched : ", schedule.time);
-        console.log("schedlocal : ", schedule.time.toLocaleString());
 
         return {
           time: schedule.time.toLocaleTimeString(),
@@ -224,14 +220,12 @@ class Ticket {
         },
       });
 
-      console.log(ticketOrderDto.date);
       const ticketDate = new Date(ticketOrderDto.date);
       ticketDate.setHours(sched.time.getHours());
       ticketDate.setMinutes(sched.time.getMinutes());
       ticketDate.setSeconds(0);
       ticketDate.setMilliseconds(0);
 
-      console.log(ticketDate);
       const bookedTickets = await prisma.ticket.findMany({
         where: {
           scheduleId: ticketOrderDto.scheduleId,
@@ -290,15 +284,15 @@ class Ticket {
           data: tickets,
         });
 
-        return payment
+        return payment;
       });
 
       return {
         status: true,
         message: "Success order tickets",
-        data : {
-          id : newPayment.id
-        }
+        data: {
+          id: newPayment.id,
+        },
       };
     } catch (err) {
       console.log(err);

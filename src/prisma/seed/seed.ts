@@ -50,9 +50,10 @@ async function main() {
   for (let i in movie) {
     const minutes = [15, 20, 30, 45, 55];
     for (let j in teaterData) {
+      const scheduleList : Prisma.ScheduleCreateManyInput[] = []
       const currentDate = new Date();
       const end_day = randomPicker(-5, 20);
-      const hours = pickUniqueNumbers(11, 22, 6);
+      const hours = pickUniqueNumbers(11, 22, 3);
       for (let h in hours) {
         let hour = hours[h];
         const minute = minutes[randomPicker(0, minutes.length - 1)];
@@ -63,7 +64,7 @@ async function main() {
         dateObj.setSeconds(0)
         dateObj.setMilliseconds(0)
         let time = dateObj;
-        const newSchedule: Schedule = {
+        const newSchedule: Prisma.ScheduleCreateManyInput = {
           id,
           movieId: movie[i].id,
           teaterId: teaterData[j].id,
@@ -71,13 +72,13 @@ async function main() {
           end_date: new Date(currentDate.getTime() + (end_day * 24 * 60 * 60 * 1000)), // dyanmic
           time,
         };
-        await prisma.schedule.upsert({
-          where: { id: newSchedule.id },
-          update: newSchedule,
-          create: newSchedule,
-        });
+        console.log(id)
+        scheduleList.push(newSchedule)
         id++;
       }
+      await prisma.schedule.createMany({
+        data : scheduleList
+      });
     }
   }
 }

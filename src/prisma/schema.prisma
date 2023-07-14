@@ -7,8 +7,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL") 
+  directUrl         = env("POSTGRES_URL_NON_POOLING") 
+  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING")
+  // provider = "mysql"
+  // url      = env("DATABASE_URL")
 }
 
 model User {
@@ -77,12 +81,12 @@ model Payment {
   userId        String
   status        PaymentStatus
   amount        Int
-  transactionId String?          @unique
+  transactionId String?       @unique
   transaction   Transaction?  @relation(fields: [transactionId], references: [id])
 }
 
 model Transaction {
-  id      String             @id @default(cuid())
+  id      String          @id @default(cuid())
   date    DateTime        @default(now())
   userId  String
   method  PaymentMethod
@@ -137,6 +141,7 @@ enum TransactionType {
   BUYTICKET @map("Buy Ticket")
   TOPUP     @map("Top Up")
   WITHDRAW  @map("Withdraw")
+  NONE      @map("None")
 }
 
 enum PaymentStatus {

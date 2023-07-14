@@ -21,7 +21,6 @@ class Seat {
       if (isNaN(parseInt(scheduleId))) throw new BadRequestException("ScheduleId is not valid");
       const parsedDate = new Date(date);
       parsedDate.setUTCHours(0)
-      console.log(scheduleId, parsedDate)
       const res = await prisma.ticket.findMany({
         where: {
           date : {
@@ -33,8 +32,6 @@ class Seat {
           seat : true
         },
       });
-
-      console.log(res)
 
       const seats = res.map(seat => seat.seat)
       return {

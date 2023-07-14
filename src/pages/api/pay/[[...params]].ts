@@ -21,6 +21,8 @@ import { TransactionDTO } from "@/apiDecorators/dto/pay/transactionDto";
 import { OrderDTO } from "@/apiDecorators/dto/pay/orderDto";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { TicketTrans, TransHistory } from "@/interfaces/Transaction";
+import { CancelOrderDTO } from "@/apiDecorators/dto/pay/cancleOrder";
+import { PaymentMethod } from "@prisma/client";
 
 @Catch(validationExceptionHandler)
 class Pay {
@@ -227,8 +229,6 @@ class Pay {
 
       if (!paymentData) throw new BadRequestException("Order not found");
 
-      console.log(paymentData.due_date.toLocaleString(), paymentData.due_date.getTime());
-      console.log(new Date().toLocaleString(), new Date().getTime());
       if (paymentData.due_date.getTime() < new Date().getTime()) {
         await prisma.payment.update({
           where: {
@@ -290,7 +290,7 @@ class Pay {
 
   @Post("/cancelorder")
   async cancelOrder(
-    @Body(ValidationPipe) orderDto: OrderDTO,
+    @Body(ValidationPipe) orderDto: CancelOrderDTO,
     @Req() req: NextApiRequest,
     @Res() res: NextApiResponse
   ): Promise<ResponseDTO> {
@@ -308,25 +308,28 @@ class Pay {
 
       if (!paymentData) throw new BadRequestException("Order not found");
 
-      await prisma.$transaction([
-        prisma.transaction.create({
+      await prisma.$transaction(async () => {
+
+        const trans = await prisma.transaction.create({
           data: {
             amount: 0,
-            method: orderDto.paymentMethod,
+            method: PaymentMethod.BCA,
             type: "BUYTICKET",
             userId,
           },
-        }),
-        prisma.payment.update({
+        })
+
+        await prisma.payment.update({
           where: {
             userId,
             id: orderDto.paymentId,
           },
           data: {
             status: "CANCEL",
+            transactionId : trans.id
           },
-        }),
-      ]);
+        })
+      });
 
       return {
         status: true,

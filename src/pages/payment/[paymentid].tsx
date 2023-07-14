@@ -5,6 +5,5 @@ export default function PaymentPage () {
   return (
     <Layout>
       <Payment />
-    </Layout>
-  )
+    </Layout>)
 }

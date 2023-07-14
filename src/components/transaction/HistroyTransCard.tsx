@@ -16,7 +16,6 @@ export default function HistoryTransCard({ transaction }: HistoryTransCardProps)
 
   const getMovie = async () => {
     if (transaction.payment) {
-      console.log(transaction.payment.id);
       const result = await nextApi().get("/api/ticket/p/" + transaction.payment?.id);
       setDetailTicket(result.data.data);
       setShowDetail(true);

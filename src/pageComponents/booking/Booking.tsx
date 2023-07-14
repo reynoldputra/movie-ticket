@@ -32,9 +32,10 @@ export default function Booking() {
     };
     setMovie(movie);
   };
+
   useEffect(() => {
-    getData();
-  }, []);
+    if(slug) getData();
+  }, [slug]);
 
   return (
     <Grid className="pt-40">

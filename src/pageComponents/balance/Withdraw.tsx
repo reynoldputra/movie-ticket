@@ -21,13 +21,11 @@ export default function Withdraw() {
     const error = await withdrawPost(data)
     if(error) {
       error.map((err : any) => {
-        console.log(err.message)
         formMethod.setError(err.target, {
           type : "validation",
           message : err.message
         })
       })
-      console.log(formMethod.formState.errors)
     } else {
       formMethod.reset()
     }
