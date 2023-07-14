@@ -70,6 +70,7 @@
 - [x] Movies page (get static props)
 - [x] Movie detail page (get static path)
 - [x] Book ticket
+- [x] Payment
 - [x] Topup
 - [ ] Withdraw
 - [x] Login

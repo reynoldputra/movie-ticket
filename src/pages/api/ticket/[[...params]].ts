@@ -141,7 +141,6 @@ class Ticket {
       })
 
       if(movie.age_rating > userInfo?.age) throw new BadRequestException("Age restricted")
-      if(movie.price * ticketOrderDto.seats.length > userInfo?.balance) throw new BadRequestException("Low balance")
 
       await prisma.$transaction(async () => {
         const payment = await prisma.payment.create({

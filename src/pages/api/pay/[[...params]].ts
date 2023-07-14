@@ -25,8 +25,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 class Pay {
   @Get("/active")
   async getWaitingPayment(
-    @Req() req : NextApiRequest,
-    @Res() res : NextApiResponse
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
   ): Promise<ResponseDTO> {
     try {
       const session = await checkSession(req, res);
@@ -69,9 +69,9 @@ class Pay {
 
   @Get("/:paymentid")
   async getPaymentDetails(
-    @Param('paymentid') paymentId : string,
-    @Req() req : NextApiRequest,
-    @Res() res : NextApiResponse
+    @Param("paymentid") paymentId: string,
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
   ): Promise<ResponseDTO> {
     try {
       const session = await checkSession(req, res);
@@ -80,39 +80,53 @@ class Pay {
         where: {
           userId,
           status: "WAITING",
-          id: paymentId
+          id: paymentId,
         },
-        select: {
-          tickets: {
-            select: {
-              schedule: {
-                select: {
-                  movie: true,
-                  time: true,
-                  teater: {
-                    select: { name: true },
-                  },
-                },
-              },
-              date: true,
-            },
-          },
-          transaction: {
-            select: {
-              amount: true,
-              date: true,
-            },
-          },
+        include : {
+          tickets : true
+        }
+      });
+
+      const scheduleRes = await prisma.schedule.findFirstOrThrow({
+        where: {
+          id: result.tickets[0].scheduleId,
+        },
+        include: {
+          movie: true,
+          teater: true,
         },
       });
+
+      const movieRes = await prisma.movie.findFirstOrThrow({
+        where: {
+          id: scheduleRes.movieId,
+        },
+      });
+
+      const seats = result.tickets.map((t) => t.seat);
 
       return {
         status: true,
         message: "Success get payment detail",
-        data: result,
+        data: {
+          ticketDetail: {
+            time: scheduleRes.time,
+            date: result.tickets[0].date,
+            teater: scheduleRes.teater.name,
+            count_ticket: result.tickets.length,
+            orderId: paymentId,
+            qr_url: "",
+            movie: movieRes,
+            seats,
+          },
+          paymentDetail : {
+            due_date : result.due_date,
+            amount : result.amount
+          }
+        },
       };
     } catch (err) {
-      console.log(err)
+      console.log(err);
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
       throw new InternalServerErrorException();
     }
@@ -264,9 +278,13 @@ class Pay {
   }
 
   @Post("/payorder")
-  async payOrder(@Body(ValidationPipe) orderDto: OrderDTO): Promise<ResponseDTO> {
+  async payOrder(
+    @Body(ValidationPipe) orderDto: OrderDTO,
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
+  ): Promise<ResponseDTO> {
     try {
-      const session = await checkSession();
+      const session = await checkSession(req, res);
       const userId = session.user.id;
 
       const paymentData = await prisma.payment.findUnique({
@@ -291,25 +309,41 @@ class Pay {
         throw new BadRequestException("Payment is expired");
       }
 
-      await prisma.$transaction([
-        prisma.transaction.create({
+      await prisma.$transaction(async (tx) => {
+        const transaction = await tx.transaction.create({
           data: {
             amount: paymentData.amount,
             method: orderDto.paymentMethod,
             type: "BUYTICKET",
             userId,
           },
-        }),
-        prisma.payment.update({
+        })
+        await tx.payment.update({
           where: {
             userId,
             id: orderDto.paymentId,
           },
           data: {
             status: "COMPLETE",
+            transactionId : transaction.id 
           },
-        }),
-      ]);
+        })
+
+        const user = await tx.user.findFirstOrThrow({
+          where : {
+            id : userId
+          }
+        })
+
+        await tx.user.update({
+          where : {
+            id : userId
+          },
+          data : {
+            balance : user.balance - paymentData.amount
+          }
+        })
+      });
 
       return {
         status: true,

@@ -1,97 +1,132 @@
+import DropdownWithCtx from "@/components/form/DropdownWithCtx";
 import GeneralForm from "@/components/form/GeneralForm";
+import InputWithCtx from "@/components/form/InputWithCtx";
 import Cell from "@/components/layout/cell";
 import Grid from "@/components/layout/grid";
+import { Item } from "@/interfaces/DropdownItems";
 import { Ticket } from "@/interfaces/Ticket";
 import { TicketTrans } from "@/interfaces/Transaction";
 import nextApi from "@/lib/client/api";
+import { payOrderPost } from "@/lib/client/payOrderPost";
+import { PaymentMethod } from "@prisma/client";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+
+interface ItemDetail {
+  label: string;
+  value: string | number;
+}
 
 export default function Payment() {
-  const router = useRouter()
-  const paymentid = router.query.paymentid
+  const router = useRouter();
+  const paymentid = router.query.paymentid;
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [ticketDetail, setTicketDetail] = useState<ItemDetail[] | null>(null);
+  // const [payment, setPayment] = useState<TicketTrans | null>(null);
 
   const getPaymentDetail = async () => {
-    const result = await nextApi().get("/api/pay/" + paymentid).catch((err) => console.log(err))
-    console.log ("pay detail", result)
-  }
+    try {
+      const result = await nextApi().get("/api/pay/" + paymentid);
+      const detail = result.data.data;
+      console.log("pay detail", detail);
 
-  useEffect(()=> {
-    if(paymentid) getPaymentDetail()
-  },[])
+      // const schedule: any = detail.paymentDetail;
+      // const paymentDetail = schedule.paymentDetail;
+      const ticketDetail = detail.ticketDetail;
+      const ticket: Ticket = {
+        time: ticketDetail.time,
+        date: ticketDetail.date,
+        teater: ticketDetail.teater,
+        count_ticket: ticketDetail.count_ticket,
+        orderId: paymentid ? paymentid.toString() : "",
+        qr_url: "",
+        movie: ticketDetail.movie,
+        seats: ticketDetail.seats,
+      };
 
-  const ticket: Ticket = {
-    uid: "asdas1231",
-    time: "12.05",
-    date: new Date("3-5-2023"),
-    teater: "XXI PAKUWON CITY MALL",
-    count_ticket: 4,
-    orderId: "weqe121eqw",
-    qr_url: "",
-    movie: {
-      id: 2,
-      title: "The Super Mario Bros. Movie",
-      description:
-        "Ketika sedang bekerja di bawah tanah untuk memperbaiki pipa air, Mario dan Luigi, yang merupakan tukang ledeng dari Brooklyn, tiba-tiba terhisap ke dalam pipa misterius dan masuk ke dunia yang sangat berbeda. Mereka berada di tempat yang ajaib dan aneh. Tapi sayangnya, mereka terpisah satu sama lain. Mario memulai petualangan besar untuk mencari dan menemukan Luigi.",
-      release_date: new Date("2023-04-05"),
-      poster_url: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg",
-      age_rating: 14,
-      price: 49000,
-    },
-    seats : [1, 2, 3],
-    transactionId : "adfas1231"
-  };
+      // const payment: TicketTrans = {
+      //   uid: paymentid ? paymentid.toString() : "",
+      //   cash: paymentDetail.amount,
+      //   validDate: paymentDetail.due_date,
+      // };
+      // setPayment(payment);
 
-  const transaction: TicketTrans = {
-    uid: "adfas1231",
-    cash: 123000,
-    validDate: new Date("3-5-2023"),
-    paymentMethod: "BCA"
-  };
-
-  const ticketDetail = [
-    {
-      label: "Movie name",
-      value: ticket.movie.title,
-    },
-    {
-      label: "Date",
-      value: ticket.date.toDateString(),
-    },
-    {
-      label: "Tickets",
-      value: ticket.count_ticket,
-    },
-    {
-      label: "Teater",
-      value: ticket.teater,
-    },
-    {
-      label: "Seats",
-      value: ticket.seats.join(", "),
-    },
-    {
-      label: "Payment method",
-      value: transaction.paymentMethod,
+      setTicket(ticket);
+      setTicketDetail([
+        {
+          label: "Movie name",
+          value: ticket.movie.title,
+        },
+        {
+          label: "Date",
+          value: new Date(ticket.date).toDateString(),
+        },
+        {
+          label: "Tickets",
+          value: ticket.count_ticket,
+        },
+        {
+          label: "Teater",
+          value: ticket.teater,
+        },
+        {
+          label: "Seats",
+          value: ticket.seats.join(", "),
+        },
+      ]);
+    } catch (err) {
+      console.log(err);
     }
+  };
+
+  useEffect(() => {
+    getPaymentDetail();
+  }, []);
+
+  const formMethod = useForm<{ method: string }>();
+
+  const onSubmit = formMethod.handleSubmit( async (data) => {
+    console.log(data);
+    await payOrderPost({
+      paymentMethod : data.method,
+      paymentId : paymentid ? paymentid.toString() : ""
+    })
+  });
+
+  const paymentList: Item[] = [
+    { value: "BCA", tag: PaymentMethod.BCA },
+    { value: "QRIS", tag: PaymentMethod.QRIS },
   ];
 
   return (
     <Grid className="pt-40">
       <Cell cols="1_full" className="flex justify-center">
-        <GeneralForm title="Ticket Payment" submitLabel="Pay" className="w-[500px] px-16">
-          <p className="text-black font-bold">Ticket Detail</p>
-          <div className="grid grid-cols-8 gap-y-1">
-            {ticketDetail.map((item) => (
-              <>
-                <p className="col-span-2">{item.label}</p>
-                <p className="col-span-1 text-center">:</p>
-                <p className="col-span-5">{item.value}</p>
-              </>
-            ))}
-          </div>
-          <p className="w-full text-xl font-bold text-center py-6 text-green-500">IDR {ticket.count_ticket * ticket.movie.price}</p>
-        </GeneralForm>
+        <FormProvider {...formMethod}>
+          <form onSubmit={onSubmit}>
+            <GeneralForm title="Ticket Payment" submitLabel="Pay" className="w-[500px] px-16">
+              <p className="text-black font-bold">Ticket Detail</p>
+              <div className="grid grid-cols-8 gap-y-1">
+                {ticketDetail &&
+                  ticketDetail.map((item, idx) => (
+                    <React.Fragment key={idx}>
+                      <p className="col-span-2">{item.label}</p>
+                      <p className="col-span-1 text-center">:</p>
+                      <p className="col-span-5">{item.value}</p>
+                    </React.Fragment>
+                  ))}
+              </div>
+              <div>
+                <DropdownWithCtx items={paymentList} name="method" label="Payment Method" />
+                {ticket && (
+                  <p className="w-full text-xl font-bold text-center pt-6 pb-2 text-green-500">
+                    IDR {ticket.count_ticket * ticket.movie.price}
+                  </p>
+                )}
+              </div>
+            </GeneralForm>
+          </form>
+        </FormProvider>
       </Cell>
     </Grid>
   );
