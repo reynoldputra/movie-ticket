@@ -289,9 +289,13 @@ class Pay {
   }
 
   @Post("/cancelorder")
-  async cancelOrder(@Body(ValidationPipe) orderDto: OrderDTO): Promise<ResponseDTO> {
+  async cancelOrder(
+    @Body(ValidationPipe) orderDto: OrderDTO,
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
+  ): Promise<ResponseDTO> {
     try {
-      const session = await checkSession();
+      const session = await checkSession(req, res);
       const userId = session.user.id;
 
       const paymentData = await prisma.payment.findUnique({
