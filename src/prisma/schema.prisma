@@ -49,10 +49,10 @@ model Teater {
 model Schedule {
   id         Int      @id @default(autoincrement())
   teaterId   Int
-  time       DateTime @db.Time()
+  time       DateTime
   movieId    Int
-  end_date   DateTime @db.Date
-  start_date DateTime @db.Date
+  end_date   DateTime
+  start_date DateTime
   teater     Teater   @relation(fields: [teaterId], references: [id])
   movie      Movie    @relation(fields: [movieId], references: [id])
   tickets    Ticket[]
@@ -63,7 +63,7 @@ model Ticket {
   scheduleId Int
   userId     String
   paymentId  String
-  date       DateTime @db.Date
+  date       DateTime
   seat       Int
   user       User     @relation(fields: [userId], references: [id])
   schedule   Schedule @relation(fields: [scheduleId], references: [id])
@@ -77,12 +77,12 @@ model Payment {
   userId        String
   status        PaymentStatus
   amount        Int
-  transactionId Int?          @unique
+  transactionId String?          @unique
   transaction   Transaction?  @relation(fields: [transactionId], references: [id])
 }
 
 model Transaction {
-  id      Int             @id @default(autoincrement())
+  id      String             @id @default(cuid())
   date    DateTime        @default(now())
   userId  String
   method  PaymentMethod

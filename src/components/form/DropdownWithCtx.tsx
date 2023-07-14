@@ -1,5 +1,5 @@
 // Drop down input using react-hook-form context
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { Item } from "@/interfaces/DropdownItems";
 import UpDownIcon from "@/pageComponents/booking/bookingForm/UpDownIcon";
@@ -17,7 +17,7 @@ export default function DropdownWithCtx({ items, name, label, option }: Dropdown
   const {
     register,
     formState: { errors },
-    setValue
+    setValue,
   } = useFormContext();
 
   return (

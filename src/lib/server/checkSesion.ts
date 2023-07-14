@@ -6,7 +6,6 @@ import { getServerSession } from "next-auth";
 
 export const checkSession = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, authOptions);
-  console.log(session)
   if (!session) throw new UnauthorizedException();
   return session
 };

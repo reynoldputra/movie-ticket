@@ -12,45 +12,126 @@ import {
   BadRequestException,
   Req,
   Res,
+  Param,
 } from "next-api-decorators";
 import prisma from "@/lib/prisma";
 import { checkSession } from "@/lib/server/checkSesion";
 import { TicketOrderDTO } from "@/apiDecorators/dto/ticket/ticketOrderDto";
 import { Prisma, Ticket as TicketType } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { formaterDate } from "@/lib/server/formatDate";
+import { Ticket as TTicket } from "@/interfaces/Ticket";
+import { JwtAuthGuard } from "@/apiDecorators/decorator/auth";
 
 @Catch(validationExceptionHandler)
 class Ticket {
-  @Get("/active")
-  async getActiveTickets() {
+  @Get("/p/:paymentid")
+  @JwtAuthGuard()
+  async getPaymentDetail(
+    @Param("paymentid") id: string,
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
+  ) {
     try {
-      const session = await checkSession();
+      const session = await checkSession(req, res);
       const userId = session.user.id;
-      const currentDateTime = new Date();
-      const res = await prisma.payment.findMany({
+      const result = await prisma.payment.findFirstOrThrow({
+        include: {
+          tickets: {
+            include: {
+              schedule: {
+                include: {
+                  teater: true,
+                  movie: true,
+                },
+              },
+            },
+          },
+        },
+        where: {
+          id,
+          userId,
+        },
+      });
+
+      const ticket = result.tickets[0];
+      const schedule = ticket.schedule;
+      const teater = schedule.teater;
+
+      const ticketData = {
+        time: schedule.time.toLocaleTimeString(),
+        date: ticket.date,
+        teater: teater.name,
+        count_ticket: result.tickets.length,
+        orderId: result.id,
+        qr_url: "",
+        movie: schedule.movie,
+        seats: result.tickets.map((t) => t.seat),
+      };
+
+      return {
+        status: true,
+        message: "Succes get payment info",
+        data: ticketData,
+      };
+    } catch (err) {
+      console.log(err)
+      if (err instanceof UnauthorizedException) throw new UnauthorizedException();
+      throw new InternalServerErrorException();
+    }
+  }
+  @Get("/active")
+  @JwtAuthGuard()
+  async getActiveTickets(@Req() req: NextApiRequest, @Res() res: NextApiResponse) {
+    try {
+      const session = await checkSession(req, res);
+      const userId = session.user.id;
+      const result = await prisma.payment.findMany({
+        include: {
+          tickets: {
+            include: {
+              schedule: {
+                include: {
+                  teater: true,
+                  movie: true,
+                },
+              },
+            },
+          },
+        },
         where: {
           userId,
           status: "COMPLETE",
           tickets: {
             some: {
               date: {
-                gt: currentDateTime,
-              },
-              schedule: {
-                time: {
-                  gt: currentDateTime,
-                },
+                gt: new Date(),
               },
             },
           },
         },
       });
 
+      const ticketGroup: TTicket[] = result.map((w): TTicket => {
+        const ticket = w.tickets[0];
+        const schedule = ticket.schedule;
+        const teater = schedule.teater;
+
+        return {
+          time: schedule.time.toLocaleTimeString(),
+          date: ticket.date,
+          teater: teater.name,
+          count_ticket: w.tickets.length,
+          orderId: w.id,
+          qr_url: "",
+          movie: schedule.movie,
+          seats: w.tickets.map((t) => t.seat),
+        };
+      });
+
       return {
         status: true,
         message: "Succes get active ticket",
-        data: res,
+        data: ticketGroup,
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
@@ -59,34 +140,61 @@ class Ticket {
   }
 
   @Get("/history")
-  async getTicketHistory() {
+  async getTicketHistory(@Req() req: NextApiRequest, @Res() res: NextApiResponse) {
     try {
-      const session = await checkSession();
+      const session = await checkSession(req, res);
       const userId = session.user.id;
-      const currentDateTime = new Date();
-      const res = await prisma.payment.findMany({
+      const result = await prisma.payment.findMany({
+        include: {
+          tickets: {
+            include: {
+              schedule: {
+                include: {
+                  teater: true,
+                  movie: true,
+                },
+              },
+            },
+          },
+        },
         where: {
           userId,
           status: "COMPLETE",
           tickets: {
             some: {
               date: {
-                lt: currentDateTime,
-              },
-              schedule: {
-                time: {
-                  lt: currentDateTime,
-                },
+                lt: new Date(),
               },
             },
           },
         },
       });
 
+      console.log(result);
+
+      const ticketGroup: TTicket[] = result.map((w): TTicket => {
+        const ticket = w.tickets[0];
+        const schedule = ticket.schedule;
+        const teater = schedule.teater;
+        console.log("sched : ", schedule.time);
+        console.log("schedlocal : ", schedule.time.toLocaleString());
+
+        return {
+          time: schedule.time.toLocaleTimeString(),
+          date: ticket.date,
+          teater: teater.name,
+          count_ticket: w.tickets.length,
+          orderId: w.id,
+          qr_url: "",
+          movie: schedule.movie,
+          seats: w.tickets.map((t) => t.seat),
+        };
+      });
+
       return {
         status: true,
-        message: "Succes get ticket history",
-        data: res,
+        message: "Succes get history ticket",
+        data: ticketGroup,
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
@@ -107,12 +215,27 @@ class Ticket {
       const checkDate = Date.parse(ticketOrderDto.date);
       if (isNaN(checkDate)) throw new BadRequestException("Date is not valid");
 
-      const date = formaterDate(ticketOrderDto.date);
+      const sched = await prisma.schedule.findFirstOrThrow({
+        where: {
+          id: ticketOrderDto.scheduleId,
+        },
+        select: {
+          time: true,
+        },
+      });
 
+      console.log(ticketOrderDto.date);
+      const ticketDate = new Date(ticketOrderDto.date);
+      ticketDate.setHours(sched.time.getHours());
+      ticketDate.setMinutes(sched.time.getMinutes());
+      ticketDate.setSeconds(0);
+      ticketDate.setMilliseconds(0);
+
+      console.log(ticketDate);
       const bookedTickets = await prisma.ticket.findMany({
         where: {
           scheduleId: ticketOrderDto.scheduleId,
-          date,
+          date: ticketDate,
         },
         select: {
           seat: true,
@@ -135,14 +258,14 @@ class Ticket {
       });
 
       const userInfo = await prisma.user.findFirstOrThrow({
-        where : {
-          id : userId
-        }
-      })
+        where: {
+          id: userId,
+        },
+      });
 
-      if(movie.age_rating > userInfo?.age) throw new BadRequestException("Age restricted")
+      if (movie.age_rating > userInfo?.age) throw new BadRequestException("Age restricted");
 
-      await prisma.$transaction(async () => {
+      const newPayment = await prisma.$transaction(async () => {
         const payment = await prisma.payment.create({
           data: {
             amount: movie.price * ticketOrderDto.seats.length,
@@ -153,10 +276,9 @@ class Ticket {
         });
 
         const tickets: Prisma.TicketCreateManyInput[] = [];
-        console.log(ticketOrderDto);
         for (let idx in ticketOrderDto.seats) {
           tickets.push({
-            date: date,
+            date: ticketDate,
             scheduleId: ticketOrderDto.scheduleId,
             paymentId: payment.id,
             seat: ticketOrderDto.seats[idx],
@@ -168,11 +290,15 @@ class Ticket {
           data: tickets,
         });
 
+        return payment
       });
 
       return {
         status: true,
         message: "Success order tickets",
+        data : {
+          id : newPayment.id
+        }
       };
     } catch (err) {
       console.log(err);
@@ -181,7 +307,6 @@ class Ticket {
       throw new InternalServerErrorException();
     }
   }
-
 }
 
 export default createHandler(Ticket);

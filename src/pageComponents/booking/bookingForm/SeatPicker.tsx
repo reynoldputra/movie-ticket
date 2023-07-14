@@ -27,9 +27,9 @@ export default function SeatPicker({onClickSeatHandle, seats, booked}  : {onClic
 
   return (
     <Modal title="Choose a seats">
-      <div>
+      <div className="px-4 flex flex-col items-center">
         <div className="px-12 py-4">{seatsDiv}</div>
-        <div className="text-sm font-bold text-slate-600 w-full text-center bg-blue-100 py-1 my-2">Screen</div>
+        <div className="text-sm font-bold text-slate-600 w-full max-w-[200px] text-center bg-blue-100 py-1 my-2">Screen</div>
       </div>
     </Modal>
   );

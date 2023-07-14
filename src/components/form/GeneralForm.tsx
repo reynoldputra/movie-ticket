@@ -11,7 +11,7 @@ interface GeneralFormProps {
 export default function GeneralForm({ children, title, submitLabel, className }: GeneralFormProps) {
   return (
     <div className={clsxm([
-      "w-[400px] min-h-[400px] bg-white rounded-xl text-black px-8 py-8 flex flex-col justify-center items-center gap-8",
+      "w-full max-w[400px] bg-white rounded-xl text-black px-8 py-8 flex flex-col justify-center items-center gap-8",
       className
     ])}>
       <div className="text-black font-bold text-xl text-center">{title}</div>

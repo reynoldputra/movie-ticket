@@ -3,7 +3,7 @@ import { Popover, Transition } from '@headlessui/react'
 import { getSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
-import { BiLogOut } from 'react-icons/bi'
+import { BiLogOut, BiMoneyWithdraw } from 'react-icons/bi'
 import { CgProfile } from 'react-icons/cg'
 import { MdPayments } from 'react-icons/md'
 
@@ -43,7 +43,7 @@ export default function ProfileNavbar({username = "empty", id} : {username : str
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-10 mt-3 w-screen max-w-xs -translate-x-44 transform px-4 sm:px-0">
+              <Popover.Panel className="absolute z-10 mt-3 w-screen max-w-xs -translate-x-[74%] transform px-4 sm:px-0">
                 <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                   <div className="bg-gray-50 p-4">
                     <div
@@ -58,6 +58,28 @@ export default function ProfileNavbar({username = "empty", id} : {username : str
                     </div>
                   </div>
                   <div className='py-2 bg-white'>
+                    <Link href="/ticket" className="md:hidden">
+                      <div
+                        className="flex py-4 items-center px-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                      >
+                        <div className="ml-4">
+                          <p className="text-sm font-medium text-black">
+                            Ticket
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                    <Link href="/transaction" className="md:hidden">
+                      <div
+                        className="flex py-4 items-center px-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                      >
+                        <div className="ml-4">
+                          <p className="text-sm font-medium text-black">
+                            Transaction
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
                     <Link href="/topup">
                       <div
                         className="flex items-center px-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
@@ -68,6 +90,20 @@ export default function ProfileNavbar({username = "empty", id} : {username : str
                         <div className="ml-4">
                           <p className="text-sm font-medium text-black">
                             Top up
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                    <Link href="/withdraw">
+                      <div
+                        className="flex items-center px-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center text-white sm:h-12 sm:w-12">
+                          <BiMoneyWithdraw className="text-yellow-400 h-6 w-6" />
+                        </div>
+                        <div className="ml-4">
+                          <p className="text-sm font-medium text-black">
+                            Withdraw
                           </p>
                         </div>
                       </div>

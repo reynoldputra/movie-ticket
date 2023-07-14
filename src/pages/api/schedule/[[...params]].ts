@@ -15,8 +15,8 @@ import prisma from "@/lib/prisma";
 import { Prisma, Schedule as ScheduleType, Teater } from "@prisma/client";
 
 interface ScheduleInTheater {
-  teater : Teater,
-  schedules : unknown[]
+  teater: Teater;
+  schedules: unknown[];
 }
 
 @Catch(validationExceptionHandler)
@@ -47,23 +47,32 @@ class Schedule {
       });
 
       const theaters = await prisma.teater.findMany({
-        where : {
-          city
-        }
-      })
+        where: {
+          city,
+        },
+      });
 
-      const filteredSchedule : ScheduleInTheater[] = [] 
-      for(let theaterIdx in theaters) {
-        let schedulePerTheater : unknown[] = []
-        for(let scheduleIdx in schedules) {
-          if(schedules[scheduleIdx].teaterId == theaters[theaterIdx].id) {
-            const sched : unknown = schedules[scheduleIdx]
-            schedulePerTheater.push(sched)
-          } 
+      const filteredSchedule: ScheduleInTheater[] = [];
+      for (let theaterIdx in theaters) {
+        let schedulePerTheater: unknown[] = [];
+        for (let scheduleIdx in schedules) {
+          if (schedules[scheduleIdx].teaterId == theaters[theaterIdx].id) {
+            const sched = schedules[scheduleIdx];
+            let checkDateScedh = new Date(sched.time);
+            const userDate = new Date(date);
+            const currentDate = new Date();
+            console.log(userDate.toLocaleDateString(), currentDate.toLocaleDateString())
+            if (
+              currentDate.toLocaleDateString() == userDate.toLocaleDateString() 
+            ) {
+              if (checkDateScedh.getTime() > new Date().getTime()) schedulePerTheater.push(sched);
+            } else {
+              schedulePerTheater.push(sched);
+            }
+          }
         }
-        filteredSchedule.push({teater : theaters[theaterIdx], schedules : schedulePerTheater})
+        filteredSchedule.push({ teater: theaters[theaterIdx], schedules: schedulePerTheater });
       }
-
 
       if (!filteredSchedule) throw new NotFoundException();
       return {

@@ -58,7 +58,10 @@ async function main() {
         const minute = minutes[randomPicker(0, minutes.length - 1)];
         hour = hour < 10 ? 0 + hour : hour;
         let dateObj = new Date();
-        dateObj.setUTCHours(hour, minute, 0, 0);
+        dateObj.setHours(hour);
+        dateObj.setMinutes(minute)
+        dateObj.setSeconds(0)
+        dateObj.setMilliseconds(0)
         let time = dateObj;
         const newSchedule: Schedule = {
           id,

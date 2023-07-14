@@ -20,3 +20,9 @@ export const pickUniqueNumbers = (rangeStart: number, rangeEnd: number, count: n
 
   return numbers;
 };
+
+
+export const getTimeOnly = (date : Date) => {
+  return date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
+
+}

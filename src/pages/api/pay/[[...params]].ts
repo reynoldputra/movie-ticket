@@ -20,6 +20,7 @@ import { checkSession } from "@/lib/server/checkSesion";
 import { TransactionDTO } from "@/apiDecorators/dto/pay/transactionDto";
 import { OrderDTO } from "@/apiDecorators/dto/pay/orderDto";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { TicketTrans, TransHistory } from "@/interfaces/Transaction";
 
 @Catch(validationExceptionHandler)
 class Pay {
@@ -35,109 +36,43 @@ class Pay {
         where: {
           userId,
           status: "WAITING",
-        },
-        select: {
-          tickets: {
-            select: {
-              schedule: {
-                select: {
-                  movie: {
-                    select: { title: true },
-                  },
-                  time: true,
-                  teater: {
-                    select: { name: true },
-                  },
-                },
-              },
-              date: true,
-            },
+          due_date: {
+            gt: new Date(),
           },
         },
+      });
+
+      const waitingPayemnt: TicketTrans[] = result.map((p) => {
+        return {
+          uid: p.id,
+          cash: p.amount,
+          validDate: p.due_date,
+        };
       });
 
       return {
         status: true,
         message: "Success get waiting transactions",
-        data: result,
+        data: waitingPayemnt,
       };
     } catch (err) {
-      if (err instanceof UnauthorizedException) throw new UnauthorizedException();
-      throw new InternalServerErrorException();
-    }
-  }
-
-  @Get("/:paymentid")
-  async getPaymentDetails(
-    @Param("paymentid") paymentId: string,
-    @Req() req: NextApiRequest,
-    @Res() res: NextApiResponse
-  ): Promise<ResponseDTO> {
-    try {
-      const session = await checkSession(req, res);
-      const userId = session.user.id;
-      const result = await prisma.payment.findFirstOrThrow({
-        where: {
-          userId,
-          status: "WAITING",
-          id: paymentId,
-        },
-        include : {
-          tickets : true
-        }
-      });
-
-      const scheduleRes = await prisma.schedule.findFirstOrThrow({
-        where: {
-          id: result.tickets[0].scheduleId,
-        },
-        include: {
-          movie: true,
-          teater: true,
-        },
-      });
-
-      const movieRes = await prisma.movie.findFirstOrThrow({
-        where: {
-          id: scheduleRes.movieId,
-        },
-      });
-
-      const seats = result.tickets.map((t) => t.seat);
-
-      return {
-        status: true,
-        message: "Success get payment detail",
-        data: {
-          ticketDetail: {
-            time: scheduleRes.time,
-            date: result.tickets[0].date,
-            teater: scheduleRes.teater.name,
-            count_ticket: result.tickets.length,
-            orderId: paymentId,
-            qr_url: "",
-            movie: movieRes,
-            seats,
-          },
-          paymentDetail : {
-            due_date : result.due_date,
-            amount : result.amount
-          }
-        },
-      };
-    } catch (err) {
-      console.log(err);
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
       throw new InternalServerErrorException();
     }
   }
 
   @Get("/history")
-  async getHistoryTransaction(): Promise<ResponseDTO> {
+  async getHistoryTransaction(
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
+  ): Promise<ResponseDTO> {
     try {
-      const session = await checkSession();
+      const session = await checkSession(req, res);
       const userId = session.user.id;
-      const res = await prisma.transaction.findMany({
+      const result = await prisma.transaction.findMany({
+        include: {
+          payment: true,
+        },
         where: {
           userId,
           payment: {
@@ -146,40 +81,31 @@ class Pay {
             },
           },
         },
-        select: {
-          payment: {
-            select: {
-              tickets: {
-                select: {
-                  schedule: {
-                    select: {
-                      movie: {
-                        select: { title: true },
-                      },
-                      time: true,
-                      teater: {
-                        select: { name: true },
-                      },
-                    },
-                  },
-                  date: true,
-                },
-              },
-              transaction: {
-                select: {
-                  amount: true,
-                  date: true,
-                },
-              },
+      });
+
+      const historyTicket: TransHistory[] = result.map((t) => {
+        let data: TransHistory = {
+          uid: t.id,
+          cash: t.amount,
+          type: t.type as string,
+          date: t.date,
+        };
+        if (t.payment) {
+          data = {
+            ...data,
+            payment: {
+              status: t.payment?.status,
+              id: t.payment?.id,
             },
-          },
-        },
+          };
+        }
+        return data;
       });
 
       return {
         status: true,
         message: "Success get history transaction",
-        data: res,
+        data: historyTicket,
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
@@ -234,9 +160,13 @@ class Pay {
 
   @Post("/withdraw")
   @UseMiddleware()
-  async withdraw(@Body(ValidationPipe) transactionDto: TransactionDTO): Promise<ResponseDTO> {
+  async withdraw(
+    @Body(ValidationPipe) transactionDto: TransactionDTO,
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
+  ): Promise<ResponseDTO> {
     try {
-      const session = await checkSession();
+      const session = await checkSession(req, res);
       const userId = session.user.id;
       const currentBalance = await prisma.user.findUnique({
         where: { id: userId },
@@ -297,7 +227,9 @@ class Pay {
 
       if (!paymentData) throw new BadRequestException("Order not found");
 
-      if (paymentData.due_date.getTime() > Date.now()) {
+      console.log(paymentData.due_date.toLocaleString(), paymentData.due_date.getTime());
+      console.log(new Date().toLocaleString(), new Date().getTime());
+      if (paymentData.due_date.getTime() < new Date().getTime()) {
         await prisma.payment.update({
           where: {
             id: paymentData.id,
@@ -317,7 +249,7 @@ class Pay {
             type: "BUYTICKET",
             userId,
           },
-        })
+        });
         await tx.payment.update({
           where: {
             userId,
@@ -325,24 +257,24 @@ class Pay {
           },
           data: {
             status: "COMPLETE",
-            transactionId : transaction.id 
+            transactionId: transaction.id,
           },
-        })
+        });
 
         const user = await tx.user.findFirstOrThrow({
-          where : {
-            id : userId
-          }
-        })
+          where: {
+            id: userId,
+          },
+        });
 
         await tx.user.update({
-          where : {
-            id : userId
+          where: {
+            id: userId,
           },
-          data : {
-            balance : user.balance - paymentData.amount
-          }
-        })
+          data: {
+            balance: user.balance - paymentData.amount,
+          },
+        });
       });
 
       return {
@@ -399,6 +331,71 @@ class Pay {
     } catch (err) {
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();
       if (err instanceof BadRequestException) throw new BadRequestException(err.message);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Get("/:paymentid")
+  async getPaymentDetails(
+    @Param("paymentid") paymentId: string,
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
+  ): Promise<ResponseDTO> {
+    try {
+      const session = await checkSession(req, res);
+      const userId = session.user.id;
+      const result = await prisma.payment.findFirstOrThrow({
+        where: {
+          userId,
+          status: "WAITING",
+          id: paymentId,
+        },
+        include: {
+          tickets: true,
+        },
+      });
+
+      const scheduleRes = await prisma.schedule.findFirstOrThrow({
+        where: {
+          id: result.tickets[0].scheduleId,
+        },
+        include: {
+          movie: true,
+          teater: true,
+        },
+      });
+
+      const movieRes = await prisma.movie.findFirstOrThrow({
+        where: {
+          id: scheduleRes.movieId,
+        },
+      });
+
+      const seats = result.tickets.map((t) => t.seat);
+
+      return {
+        status: true,
+        message: "Success get payment detail",
+        data: {
+          ticketDetail: {
+            time: scheduleRes.time,
+            date: result.tickets[0].date,
+            teater: scheduleRes.teater.name,
+            count_ticket: result.tickets.length,
+            orderId: paymentId,
+            qr_url: "",
+            movie: movieRes,
+            seats,
+          },
+          paymentDetail: {
+            due_date: result.due_date,
+            amount: result.amount,
+          },
+        },
+      };
+    } catch (err) {
+      console.log(err);
+      if (err instanceof UnauthorizedException) throw new UnauthorizedException();
       throw new InternalServerErrorException();
     }
   }

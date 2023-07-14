@@ -1,5 +1,4 @@
 import { Ticket } from "@/interfaces/Ticket";
-import Cell from "../layout/cell";
 import clsxm from "@/lib/clsxm";
 
 interface TicketCardProps {
@@ -15,10 +14,10 @@ export default function TicketCard({ ticket, className = "" }: TicketCardProps) 
     ])}>
       <div className="w-full flex justify-between text-lg font-bold">
         <p>{ticket.movie.title}</p>
-        <p>{ticket.count_ticket}</p>
+        <p>x{ticket.count_ticket}</p>
       </div>
-      <div className="w-full flex justify-between text-sm text-slate-500">
-        <p>{ticket.time} | {ticket.date.toDateString()}</p>
+      <div className="w-full md:flex justify-between text-sm text-slate-500">
+        <p>{ticket.time} | {new Date(ticket.date).toDateString()}</p>
         <p>{ticket.teater}</p>
       </div>
     </div>

@@ -72,8 +72,8 @@
 - [x] Book ticket
 - [x] Payment
 - [x] Topup
-- [ ] Withdraw
+- [x] Withdraw
 - [x] Login
 - [x] Register
-- [ ] Tickets
+- [x] Tickets
 - [ ] Transactions

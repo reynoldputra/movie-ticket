@@ -6,52 +6,57 @@ import HistoryTransCard from "@/components/transaction/HistroyTransCard";
 import TicketTransCard from "@/components/transaction/TicketTransCard";
 import { TabItem } from "@/interfaces/TabItem";
 import { TicketTrans, TransHistory } from "@/interfaces/Transaction";
+import nextApi from "@/lib/client/api";
+import { PaymentMethod, PaymentStatus } from "@prisma/client";
+import { useEffect, useState } from "react";
 
 export default function Transaction() {
-  const ticketsTrans: TicketTrans[] = [
-    {
-      uid: "adfas1231",
-      cash: 123000,
-      validDate: new Date("3-5-2023"),
-    },
-    {
-      uid: "adfas1231",
-      cash: 123000,
-      validDate: new Date("3-5-2023"),
-    },
-  ];
+  const [waitingPayment, setWaitingPayment] = useState<TicketTrans[] | null>(null);
+  const [historyPayment, setHistoryPayment] = useState<TransHistory[] | null>(null);
 
-  const transHistory: TransHistory[] = [
-    {
-      uid: "adfas1231",
-      cash: 123000,
-      date: new Date("3-5-2023"),
-      status: {
-        tag: "success",
-        color: "text-green-400",
-      },
-      type: "Top up",
-    },
-    {
-      uid: "adfas1231",
-      cash: 123000,
-      date: new Date("3-5-2023"),
-      status: {
-        tag: "Failed",
-        color: "text-red-400",
-      },
-      type: "Ticket",
-    },
-  ];
+  const getData = async () => {
+    const active = await nextApi().get("/api/pay/active");
+    setWaitingPayment(active.data.data);
+    const history = await nextApi().get("/api/pay/history");
+    console.log(history);
+    const parsedTicket: TransHistory[] = history.data.data.map((h: TransHistory): TransHistory => {
+      let color: string = "text-blue-600";
+      h.status = {
+        tag : PaymentStatus.COMPLETE,
+        color : "text-green-400"
+      }
+
+      if (h.payment) {
+        if (h.payment.status == PaymentStatus.CANCEL) color = "text-slate-600";
+        if (h.payment.status == PaymentStatus.FAILED) color = "text-red-400";
+        if (h.payment.status == PaymentStatus.COMPLETE) color = "text-green-400";
+        return {
+          ...h,
+          status: {
+            tag: h.payment.status,
+            color,
+          },
+        };
+      }
+
+      return h;
+    });
+    setHistoryPayment(parsedTicket);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   const transTabItem: TabItem[] = [
     {
       menu: "Waiting",
       content: (
         <div className="flex flex-col gap-2">
-          {ticketsTrans.map((transaction, idx) => (
-            <TicketTransCard transaction={transaction} key={idx} />
-          ))}
+          {waitingPayment &&
+            waitingPayment.map((transaction, idx) => (
+              <TicketTransCard transaction={transaction} key={idx} />
+            ))}
         </div>
       ),
     },
@@ -59,9 +64,10 @@ export default function Transaction() {
       menu: "History",
       content: (
         <div className="flex flex-col gap-2">
-          {transHistory.map((transaction, idx) => (
-            <HistoryTransCard transaction={transaction} key={idx} />
-          ))}
+          {historyPayment &&
+            historyPayment.map((transaction, idx) => (
+              <HistoryTransCard transaction={transaction} key={idx} />
+            ))}
         </div>
       ),
     },

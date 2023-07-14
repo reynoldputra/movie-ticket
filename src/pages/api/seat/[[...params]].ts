@@ -10,7 +10,6 @@ import {
   Query,
 } from "next-api-decorators";
 import prisma from "@/lib/prisma";
-import { formaterDate } from "@/lib/server/formatDate";
 
 @Catch(validationExceptionHandler)
 class Seat {
@@ -20,7 +19,7 @@ class Seat {
       const checkDate = Date.parse(date);
       if (isNaN(checkDate)) throw new BadRequestException("Date is not valid");
       if (isNaN(parseInt(scheduleId))) throw new BadRequestException("ScheduleId is not valid");
-      const parsedDate = formaterDate(date);
+      const parsedDate = new Date(date);
       parsedDate.setUTCHours(0)
       console.log(scheduleId, parsedDate)
       const res = await prisma.ticket.findMany({

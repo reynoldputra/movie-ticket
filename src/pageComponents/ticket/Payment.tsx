@@ -59,6 +59,10 @@ export default function Payment() {
           value: ticket.movie.title,
         },
         {
+          label: "Time",
+          value: new Date(ticket.time).toLocaleTimeString(),
+        },
+        {
           label: "Date",
           value: new Date(ticket.date).toDateString(),
         },
@@ -81,8 +85,8 @@ export default function Payment() {
   };
 
   useEffect(() => {
-    getPaymentDetail();
-  }, []);
+    if(paymentid) getPaymentDetail();
+  }, [paymentid]);
 
   const formMethod = useForm<{ method: string }>();
 
@@ -91,6 +95,8 @@ export default function Payment() {
     await payOrderPost({
       paymentMethod : data.method,
       paymentId : paymentid ? paymentid.toString() : ""
+    }).then(() => {
+      router.push("/ticket") 
     })
   });
 
@@ -104,9 +110,9 @@ export default function Payment() {
       <Cell cols="1_full" className="flex justify-center">
         <FormProvider {...formMethod}>
           <form onSubmit={onSubmit}>
-            <GeneralForm title="Ticket Payment" submitLabel="Pay" className="w-[500px] px-16">
+            <GeneralForm title="Ticket Payment" submitLabel="Pay" className="px-6">
               <p className="text-black font-bold">Ticket Detail</p>
-              <div className="grid grid-cols-8 gap-y-1">
+              <div className="grid text-sm grid-cols-8 gap-y-1">
                 {ticketDetail &&
                   ticketDetail.map((item, idx) => (
                     <React.Fragment key={idx}>

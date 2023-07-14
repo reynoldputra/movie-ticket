@@ -33,14 +33,14 @@ export default function Navbar() {
     <div className="h-20 bg-gradient-to-b from-black fixed w-full z-50 flex items-center">
       <Grid screenHeight={false} className="w-full">
         <Cell cols="1_4">
-          <div className="w-64 pl-24">
+          <div className="md:w-64 md:pl-24">
             <Link href="/">
               <p className="w-fit text-cyan-300 text-center font-bold">App name</p>
             </Link>
           </div>
         </Cell>
         <Cell cols="5_4" className="flex justify-center">
-          <div className="flex gap-14">
+          <div className="gap-14 hidden lg:flex" >
             {navbarItems.map((item: NavbarItemType, idx: number) => {
               return (
                 <div key={idx} className="text-slate-200">
@@ -51,12 +51,12 @@ export default function Navbar() {
           </div>
         </Cell>
         <Cell cols="9_full">
-          <div className="w-64 flex justify-end">
+          <div className="md:w-64 md:pr-24 flex justify-end">
             {session ? (
               <ProfileNavbar username={session?.user.name ? session?.user.name : "" } id={session?.user.id} />
             ) : (
               <>
-                <Link href="/login">
+                <Link href="/signin">
                   <div className="flex items-center gap-2 font-bold">
                     <BiLogIn className="w-5 h-5" />
                     <p>Login</p>

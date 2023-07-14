@@ -8,6 +8,9 @@ import { Adapter } from "next-auth/adapters";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
+  pages : {
+    signIn : "/signin"
+  },
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",

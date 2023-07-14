@@ -33,6 +33,7 @@
     "next": "13.4.7",
     "next-api-decorators": "^2.0.2",
     "next-auth": "^4.22.1",
+    "nextjs-progressbar": "^0.0.16",
     "password-hash": "^1.2.2",
     "path-to-regexp": "^6.2.1",
     "postcss": "8.4.24",

@@ -15,6 +15,10 @@ export interface TicketTrans extends Transaction {
 
 export interface TransHistory extends Transaction {
   date: Date;
-  status: StatusType;
+  status?: StatusType;
   type: string;
+  payment? : {
+    status: string;
+    id : string 
+  }
 }

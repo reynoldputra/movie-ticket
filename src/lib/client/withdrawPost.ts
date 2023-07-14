@@ -1,19 +1,19 @@
 import { toast } from "react-toastify"
 import nextApi from "./api"
 import { AxiosError } from "axios"
-import { TicketOrderInput, TopupInput } from "@/interfaces/FormInput"
+import { TopupInput } from "@/interfaces/FormInput"
 
-export const orderTicketPost = async (value: TicketOrderInput) => {
+export const withdrawPost = async (value: TopupInput) => {
   const id = toast.loading("Sending data ...")
   try {
-    const res = await nextApi().post("/api/ticket/order", value)  
+    await nextApi().post("/api/pay/withdraw", value)  
     toast.update(id, {
-      render : "Success order tickets",
+      render : "Success topup balance",
       type : "success",
       isLoading : false,
       autoClose : 3000
     })
-    return res.data
+    return null
   } catch (err) {
     if(err instanceof AxiosError) {
       console.log(err)
@@ -23,7 +23,9 @@ export const orderTicketPost = async (value: TicketOrderInput) => {
         isLoading : false,
         autoClose : 3000
       })
+      if(err.response)  
+        if(err.response.data.error.code = 1432)
+          return err.response.data.error.data
     }
-    console.log(err)
   }
 }
