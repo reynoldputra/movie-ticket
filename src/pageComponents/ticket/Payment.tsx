@@ -29,10 +29,7 @@ export default function Payment() {
     try {
       const result = await nextApi().get("/api/pay/" + paymentid);
       const detail = result.data.data;
-      console.log("pay detail", detail);
 
-      // const schedule: any = detail.paymentDetail;
-      // const paymentDetail = schedule.paymentDetail;
       const ticketDetail = detail.ticketDetail;
       const ticket: Ticket = {
         time: ticketDetail.time,
@@ -44,13 +41,6 @@ export default function Payment() {
         movie: ticketDetail.movie,
         seats: ticketDetail.seats,
       };
-
-      // const payment: TicketTrans = {
-      //   uid: paymentid ? paymentid.toString() : "",
-      //   cash: paymentDetail.amount,
-      //   validDate: paymentDetail.due_date,
-      // };
-      // setPayment(payment);
 
       setTicket(ticket);
       setTicketDetail([
@@ -129,6 +119,9 @@ export default function Payment() {
                     IDR {ticket.count_ticket * ticket.movie.price}
                   </p>
                 )}
+              </div>
+              <div className="bg-red-600">
+                Cancel order
               </div>
             </GeneralForm>
           </form>
