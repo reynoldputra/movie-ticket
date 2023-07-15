@@ -179,6 +179,9 @@ class Pay {
       if (currentBalanceInt < transactionDto.amount)
         throw new BadRequestException("Current ballance is less than withdraw amount");
 
+      if (transactionDto.amount > 500000)
+        throw new BadRequestException("Maximum amount that can be withdrawn is 500.000");
+
       await prisma.$transaction([
         prisma.user.update({
           where: {

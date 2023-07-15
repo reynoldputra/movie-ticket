@@ -1,13 +1,12 @@
 import Tabs from "@/components/Tabs";
 import Cell from "@/components/layout/cell";
 import Grid from "@/components/layout/grid";
-import TicketCard from "@/components/ticket/TicketCard";
 import HistoryTransCard from "@/components/transaction/HistroyTransCard";
 import TicketTransCard from "@/components/transaction/TicketTransCard";
 import { TabItem } from "@/interfaces/TabItem";
 import { TicketTrans, TransHistory } from "@/interfaces/Transaction";
 import nextApi from "@/lib/client/api";
-import { PaymentMethod, PaymentStatus } from "@prisma/client";
+import { PaymentStatus } from "@prisma/client";
 import { useEffect, useState } from "react";
 
 export default function Transaction() {
@@ -26,7 +25,7 @@ export default function Transaction() {
       }
 
       if (h.payment) {
-        if (h.payment.status == PaymentStatus.CANCEL) color = "text-slate-600";
+        if (h.payment.status == PaymentStatus.CANCEL) color = "text-slate-400";
         if (h.payment.status == PaymentStatus.FAILED) color = "text-red-400";
         if (h.payment.status == PaymentStatus.COMPLETE) color = "text-green-400";
         return {

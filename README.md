@@ -30,7 +30,18 @@ This website mainly created using Next.js + PrismaORM + MySql
 
 ## Task
 ### Mandatory
+- Movie list
+- Movie detail
+- Top up balance and withdraw
+- Booking ticket
+- Pay or cancel ticket order
 ### Challange
+ - Register and login
+ - User have their own balance
+ - User can track active ticket and ticket history
+ - User can track waiting payment and payment history
 ### Deployment
+- This project is deployed using vercel and vercel storage
 ### Extra
+- Theater and Schedule. So i want to solve the real case problem for ticket booking. Each Theater have their own schedule for playing movies. User can choose where they want to watch the movies and select specific time when buying tickets.
 

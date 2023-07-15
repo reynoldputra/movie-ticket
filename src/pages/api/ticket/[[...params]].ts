@@ -21,6 +21,7 @@ import { Prisma, Ticket as TicketType } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Ticket as TTicket } from "@/interfaces/Ticket";
 import { JwtAuthGuard } from "@/apiDecorators/decorator/auth";
+import { CancelOrderDTO } from "@/apiDecorators/dto/pay/cancleOrder";
 
 @Catch(validationExceptionHandler)
 class Ticket {
@@ -294,6 +295,59 @@ class Ticket {
           id: newPayment.id,
         },
       };
+    } catch (err) {
+      console.log(err);
+      if (err instanceof UnauthorizedException) throw new UnauthorizedException();
+      if (err instanceof BadRequestException) throw new BadRequestException(err.message);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Post("/refund")
+  @JwtAuthGuard()
+  async refundTicket(
+    @Body() refundTicketDto: CancelOrderDTO,
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse
+  ) {
+    try {
+      const session = await checkSession(req, res);
+      const userId = session.user.id;
+      const userInfo = await prisma.user.findFirstOrThrow({ where: { id: userId } });
+
+      await prisma.$transaction(async () => {
+        await prisma.ticket.deleteMany({
+          where: {
+            paymentId: refundTicketDto.paymentId,
+            userId,
+            date: {
+              gt: new Date(),
+            },
+          },
+        });
+        const payment = await prisma.payment.delete({
+          where: {
+            id: refundTicketDto.paymentId,
+            userId,
+            status: "COMPLETE",
+          },
+        });
+        await prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            balance: userInfo.balance + payment.amount,
+          },
+        });
+
+        if (payment.transactionId)
+          await prisma.transaction.delete({
+            where: {
+              id: payment.transactionId,
+            },
+          });
+      });
     } catch (err) {
       console.log(err);
       if (err instanceof UnauthorizedException) throw new UnauthorizedException();

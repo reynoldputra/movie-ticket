@@ -80,12 +80,11 @@ export default function Payment() {
   const formMethod = useForm<{ method: string }>();
 
   const onSubmit = formMethod.handleSubmit( async (data) => {
-    await payOrderPost({
+    const res = await payOrderPost({
       paymentMethod : data.method,
       paymentId : paymentid ? paymentid.toString() : ""
-    }).then(() => {
-      router.push("/ticket") 
     })
+    if(res?.status) router.push("/ticket")
   });
 
   const paymentList: Item[] = [

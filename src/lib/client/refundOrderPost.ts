@@ -2,12 +2,12 @@ import { toast } from "react-toastify"
 import nextApi from "./api"
 import { AxiosError } from "axios"
 
-export const payOrderPost = async (value: {paymentMethod: string, paymentId : string }) => {
+export const refundOrderPost = async (value: {paymentId : string }) => {
   const id = toast.loading("Sending data ...")
   try {
-    const res = await nextApi().post("/api/pay/payorder", value)  
+    const res = await nextApi().post("/api/ticket/refund", value)  
     toast.update(id, {
-      render : "Success pay tickets",
+      render : "Success refund tickets",
       type : "success",
       isLoading : false,
       autoClose : 3000

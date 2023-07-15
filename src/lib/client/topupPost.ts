@@ -23,9 +23,6 @@ export const topupPost = async (value: TopupInput) => {
         isLoading : false,
         autoClose : 3000
       })
-      if(err.response?.data.error.code)  
-        if(err.response.data.error.code = 1432)
-          return err.response.data.error.data
     }
   }
 }
