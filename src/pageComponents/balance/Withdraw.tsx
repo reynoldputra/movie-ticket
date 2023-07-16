@@ -19,14 +19,7 @@ export default function Withdraw() {
 
   const onSubmit = formMethod.handleSubmit( async (data) => {
     const error = await withdrawPost(data)
-    if(error) {
-      error.map((err : any) => {
-        formMethod.setError(err.target, {
-          type : "validation",
-          message : err.message
-        })
-      })
-    } else {
+    if(!error) {
       formMethod.reset()
     }
   });
