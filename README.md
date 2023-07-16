@@ -16,7 +16,7 @@ This website mainly created using Next.js + PrismaORM + MySql
 3. Copy  `.env.example` to `.env` then fill the environment variable.
 4. Run your local database.
 	 - You can use existing database but you have to synchronize env varibale with your database config
-	 - Or run MySql using `docker compose up` and use my setup setup
+	 - Or run MySql using `docker compose up` and use my docker setup
 5.  Change prisma provider to MySql (I use vercel storage postgress for production only).
     ```prisma
         // datasource db {
