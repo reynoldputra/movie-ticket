@@ -1,5 +1,5 @@
 # Movie ticket
-Ticket booking project for SEA Compfest
+Ticket booking project for SEA Compfest.
 This website mainly created using Next.js + PrismaORM + MySql
 
 ## Configuration
@@ -13,11 +13,26 @@ This website mainly created using Next.js + PrismaORM + MySql
 	```
 	npm install
 	```
-3. Copy  `.env.example` to `.env` then fill the environment variable
-4. Run your local database
+3. Copy  `.env.example` to `.env` then fill the environment variable.
+4. Run your local database.
 	 - You can use existing database but you have to synchronize env varibale with your database config
 	 - Or run MySql using `docker compose up` and use my setup setup
-5.  Setup database
+5.  Change prisma provider to MySql (I use vercel storage postgress for production only).
+    ```prisma
+        // datasource db {
+          // provider          = "postgresql"
+          // url               = env("POSTGRES_PRISMA_URL") 
+          // directUrl         = env("POSTGRES_URL_NON_POOLING") 
+          // shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING")
+        // }
+
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+    ```
+6.  Setup database.
 	I have create schema database using [prisma](https://www.prisma.io/docs/concepts/components/prisma-schema) and seeder for development
 	``` bash
 	yarn db:push // for create table schema

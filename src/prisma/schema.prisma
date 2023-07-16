@@ -11,9 +11,12 @@ datasource db {
   url               = env("POSTGRES_PRISMA_URL") 
   directUrl         = env("POSTGRES_URL_NON_POOLING") 
   shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING")
-  // provider = "mysql"
-  // url      = env("DATABASE_URL")
 }
+
+// datasource db {
+//   provider = "mysql"
+//   url      = env("DATABASE_URL")
+// }
 
 model User {
   id           String        @id @default(cuid())
